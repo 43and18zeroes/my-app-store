@@ -7,7 +7,7 @@
     [alt]="item()!.productLogoAltText || item()!.productId"
   />
 </header>
-<app-preview-swiper></app-preview-swiper>
+<app-preview-swiper [productPreviewsPath]="item()?.productPreviewsPath || ''"></app-preview-swiper>
 <p>{{ item()!.productDescription }}</p>
 } @else {
 <p>No entry found (ID: {{ productId() }})</p>
