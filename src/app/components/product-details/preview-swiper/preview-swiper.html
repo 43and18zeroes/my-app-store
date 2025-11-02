@@ -1,1 +1,33 @@
+<!-- preview-swiper.html -->
 <p>Pfad: {{ productPreviewsPath }}</p>
+<div
+  class="swiper"
+  #swiperContainer
+  [class.swiper--mobile-padding]="isMobileDevice"
+>
+  <div class="swiper-wrapper">
+    @for (image of images; track image)
+    {
+    <a
+      class="swiper-slide"
+      (click)="onClick(image)"
+      [attr.aria-label]="image || 'Preview'"
+      (click)="$event.stopPropagation()"
+    >
+      <img
+        [src]="
+          'img/applications' + productPreviewsPath + '/' + image
+        "
+        [alt]="image || 'Preview'"
+        loading="lazy"
+        decoding="async"
+      />
+    </a>
+    }
+  </div>
+
+  @if (!isMobileDevice) {
+  <div class="swiper-button-prev"></div>
+  <div class="swiper-button-next"></div>
+  }
+</div>
