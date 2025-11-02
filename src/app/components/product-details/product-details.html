@@ -8,7 +8,7 @@
   />
 </header>
 <app-preview-swiper></app-preview-swiper>
-<app-product-description></app-product-description>
+<p>{{ item()!.productDescription }}</p>
 } @else {
 <p>No entry found (ID: {{ productId() }})</p>
 }

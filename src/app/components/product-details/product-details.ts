@@ -6,12 +6,11 @@ import {
 } from '../../pages/applications/applications.data';
 import { CommonModule } from '@angular/common';
 import { PreviewSwiper } from "./preview-swiper/preview-swiper";
-import { ProductDescription } from "./product-description/product-description";
 
 @Component({
   selector: 'app-product-details',
   standalone: true,
-  imports: [CommonModule, PreviewSwiper, ProductDescription],
+  imports: [CommonModule, PreviewSwiper],
   templateUrl: './product-details.html',
   styleUrl: './product-details.scss',
 })
