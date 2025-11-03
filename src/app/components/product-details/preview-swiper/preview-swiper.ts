@@ -1,6 +1,10 @@
 import { Component, inject, Input } from '@angular/core';
 import { DeviceService } from '../../../services/device-service';
 import { HttpClient } from '@angular/common/http';
+import Swiper from 'swiper';
+import { Navigation } from 'swiper/modules';
+import 'swiper/swiper-bundle.css';
+import { NavigationOptions, SwiperOptions } from 'swiper/types';
 
 @Component({
   selector: 'app-preview-swiper',
@@ -19,12 +23,12 @@ export class PreviewSwiper {
 
   images: string[] = [];
 
-  constructor(private http: HttpClient) {}
+  // constructor(private http: HttpClient) {}
 
   ngOnInit() {
-    this.http.get<string[]>('assets/gallery/gallery.json').subscribe((data) => {
-      this.images = data;
-    });
+    // this.http.get<string[]>('assets/gallery/gallery.json').subscribe((data) => {
+    //   this.images = data;
+    // });
   }
 
   onClick(image: string) {

@@ -1,0 +1,103 @@
+@use "../../../../styles/variables" as var;
+
+.swiper {
+  overflow: hidden;
+
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
+  padding: 16px 60px;
+  margin: -16px;
+
+  &.swiper--mobile-padding {
+    padding: 16px;
+  }
+
+  .swiper-wrapper {
+    overflow: visible;
+
+    .swiper-slide {
+      img {
+        display: block;
+        max-width: 100%;
+        border-radius: 20%;
+        box-shadow: 0 3px 5px -1px color-mix(in srgb, light-dark(#000, #fff) 10%, light-dark(#faf9fd, #121316)),
+          0 6px 10px 0
+            color-mix(
+              in srgb,
+              light-dark(#000, #fff) 10%,
+              light-dark(#faf9fd, #121316)
+            ),
+          0 1px 18px 0
+            color-mix(
+              in srgb,
+              light-dark(#000, #fff) 6%,
+              light-dark(#faf9fd, #121316)
+            );
+        transition: box-shadow 180ms ease, transform 180ms ease;
+        will-change: box-shadow, transform;
+        cursor: pointer;
+
+        &:hover,
+        &:focus {
+          box-shadow: 0 6px 7px -0.7px color-mix(in srgb, light-dark(#000, #fff)
+                  10%, light-dark(#faf9fd, #121316)),
+            0 10px 11.2px 0.7px
+              color-mix(
+                in srgb,
+                light-dark(#000, #fff) 10%,
+                light-dark(#faf9fd, #121316)
+              ),
+            0 2px 18.2px 1.4px
+              color-mix(
+                in srgb,
+                light-dark(#000, #fff) 6%,
+                light-dark(#faf9fd, #121316)
+              );
+          transform: translateY(-1px);
+        }
+      }
+    }
+  }
+
+  .swiper-button-next,
+  .swiper-button-prev {
+    /* Positionierung */
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+
+    /* Box-Modell */
+    height: calc(100% - 62px);
+    padding: 16px;
+
+    /* Layout */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    /* Typo/Icon (Swiper-Variablen) */
+    --swiper-navigation-color: light-dark(#5c5e69, #e3e2e6);
+    --swiper-navigation-size: 0px;
+
+    /* Interaktion */
+    cursor: pointer;
+
+    /* Style */
+    background: light-dark(rgba(18, 19, 22, 0), rgba(18, 19, 22, 0.5));
+    transition: background var.$mat-duration var.$mat-easing;
+  }
+
+  .swiper-button-prev {
+    width: 28px;
+    left: 0px !important;
+  }
+
+  .swiper-button-next {
+    width: 28px;
+    right: 0px !important;
+  }
+}
