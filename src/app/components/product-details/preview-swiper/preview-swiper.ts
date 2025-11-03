@@ -14,6 +14,7 @@ import { NavigationOptions, SwiperOptions } from 'swiper/types';
 })
 export class PreviewSwiper {
   private deviceService = inject(DeviceService);
+  private http = inject(HttpClient);
 
   @Input() productPreviewsPath!: string;
 
@@ -23,15 +24,29 @@ export class PreviewSwiper {
 
   images: string[] = [];
 
-  // constructor(private http: HttpClient) {}
+  private readonly base = '/img/applications/previews';
 
   ngOnInit() {
-    // this.http.get<string[]>('assets/gallery/gallery.json').subscribe((data) => {
-    //   this.images = data;
-    // });
+    const p = (this.productPreviewsPath || '').replace(/^\/+/, '');
+    const url = `${this.base}/${p}/gallery.json`;
+    console.log('[PreviewSwiper] p=', p, ' url=', url);
+
+    this.http.get<string[]>(url).subscribe({
+      next: (data) => this.images = data ?? [],
+      error: (err) => {
+        console.error('gallery.json nicht gefunden:', url, err);
+        this.images = [];
+      },
+    });
   }
 
-  onClick(image: string) {
+  imgSrc(file: string) {
+    const p = (this.productPreviewsPath || '').replace(/^\/+/, '');
+    return `${this.base}/${p}/${file}`;
+  }
+
+  onClick(image: string, ev?: MouseEvent) {
+    ev?.stopPropagation();
     console.log('image', image);
   }
 }
