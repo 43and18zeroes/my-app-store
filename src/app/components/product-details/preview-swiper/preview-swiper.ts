@@ -1,4 +1,4 @@
-import { Component, inject, Input } from '@angular/core';
+import { Component, ElementRef, inject, Input, ViewChild } from '@angular/core';
 import { DeviceService } from '../../../services/device-service';
 import { HttpClient } from '@angular/common/http';
 import Swiper from 'swiper';
@@ -18,6 +18,23 @@ export class PreviewSwiper {
 
   @Input() productPreviewsPath!: string;
 
+  @ViewChild('swiperContainer') swiperContainer!: ElementRef<HTMLElement>;
+
+  desktopBreakpoints: SwiperOptions['breakpoints'] = {
+    320: { slidesPerView: 3, slidesPerGroup: 3, spaceBetween: 20 },
+    600: { slidesPerView: 4, slidesPerGroup: 4, spaceBetween: 20 },
+    960: { slidesPerView: 6, slidesPerGroup: 6, spaceBetween: 20 },
+    1440: { slidesPerView: 8, slidesPerGroup: 8, spaceBetween: 20 },
+  };
+
+  mobileBreakpoints: SwiperOptions['breakpoints'] = {
+    320: { slidesPerView: 3, slidesPerGroup: 3, spaceBetween: 10 },
+    600: { slidesPerView: 5, slidesPerGroup: 5, spaceBetween: 10 },
+    960: { slidesPerView: 8, slidesPerGroup: 8, spaceBetween: 10 },
+  };
+
+  private swiper?: Swiper;
+
   get isMobileDevice() {
     return this.deviceService.isAndroid || this.deviceService.isiPhone;
   }
@@ -29,15 +46,18 @@ export class PreviewSwiper {
   ngOnInit() {
     const p = (this.productPreviewsPath || '').replace(/^\/+/, '');
     const url = `${this.base}/${p}/gallery.json`;
-    console.log('[PreviewSwiper] p=', p, ' url=', url);
 
     this.http.get<string[]>(url).subscribe({
-      next: (data) => this.images = data ?? [],
+      next: (data) => (this.images = data ?? []),
       error: (err) => {
         console.error('gallery.json nicht gefunden:', url, err);
         this.images = [];
       },
     });
+  }
+
+  ngAfterViewInit(): void {
+    this.initSwiper();
   }
 
   imgSrc(file: string) {
@@ -48,5 +68,43 @@ export class PreviewSwiper {
   onClick(image: string, ev?: MouseEvent) {
     ev?.stopPropagation();
     console.log('image', image);
+  }
+
+  private initSwiper() {
+    const host = this.swiperContainer?.nativeElement;
+    if (!host) return;
+
+    let nextEl: HTMLElement | undefined;
+    let prevEl: HTMLElement | undefined;
+
+    if (!this.isMobileDevice) {
+      nextEl =
+        host.querySelector<HTMLElement>('.swiper-button-next') ?? undefined;
+      prevEl =
+        host.querySelector<HTMLElement>('.swiper-button-prev') ?? undefined;
+    }
+
+    const baseConfig: SwiperOptions = {
+      modules: [Navigation],
+      loop: false,
+      navigation: {
+        nextEl: nextEl as HTMLElement,
+        prevEl: prevEl as HTMLElement,
+      } as NavigationOptions,
+      speed: this.isMobileDevice ? 200 : 500,
+      breakpoints: this.isMobileDevice
+        ? this.mobileBreakpoints
+        : this.desktopBreakpoints,
+    };
+
+    this.destroySwiper();
+    this.swiper = new Swiper(host, baseConfig);
+  }
+
+  private destroySwiper() {
+    if (this.swiper) {
+      this.swiper.destroy(true, true);
+      this.swiper = undefined;
+    }
   }
 }
