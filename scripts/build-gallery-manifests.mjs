@@ -1,4 +1,3 @@
-// scripts/build-gallery-manifests.mjs
 import { promises as fs } from 'fs';
 import path from 'path';
 import url from 'url';
@@ -7,10 +6,8 @@ const __filename = url.fileURLToPath(import.meta.url);
 const ROOT = path.dirname(__filename);
 const PROJECT_ROOT = path.resolve(ROOT, '..');
 
-// Basisordner: ...\public\img\applications\previews
 const IMAGES_ROOT = path.join(PROJECT_ROOT, 'public', 'img', 'applications', 'previews');
 
-// Optional: --watch --interval=1000
 const argv = process.argv.slice(2);
 const WATCH = argv.includes('--watch');
 const INTERVAL_MS = parseInt(argv.find(a => a.startsWith('--interval='))?.split('=')[1] || '1500', 10);
@@ -18,7 +15,7 @@ const INTERVAL_MS = parseInt(argv.find(a => a.startsWith('--interval='))?.split(
 const IMAGE_EXT = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif', '.avif', '.svg']);
 
 console.log('===============================================');
-console.log('🧭 build-gallery-manifests.mjs START');
+console.log('build-gallery-manifests.mjs START');
 console.log('[DEBUG] PROJECT_ROOT  =', PROJECT_ROOT);
 console.log('[DEBUG] IMAGES_ROOT   =', IMAGES_ROOT);
 console.log('[DEBUG] WATCH         =', WATCH, `(${INTERVAL_MS}ms)`);
@@ -29,7 +26,7 @@ async function writeManifestForDir(dir) {
   try {
     entries = await fs.readdir(dir, { withFileTypes: true });
   } catch (err) {
-    console.error('❌ readdir fehlgeschlagen:', dir, err.message);
+    console.error('readdir failed:', dir, err.message);
     return;
   }
 
@@ -41,12 +38,11 @@ async function writeManifestForDir(dir) {
   const manifestPath = path.join(dir, 'gallery.json');
   const rel = path.relative(PROJECT_ROOT, manifestPath);
 
-  // ✨ Immer schreiben – auch wenn 0 Bilder → []
   try {
     await fs.writeFile(manifestPath, JSON.stringify(images, null, 2), 'utf8');
-    console.log(`📝 ${rel} geschrieben → [${images.length} Bild(er)]`);
+    console.log(`${rel} written → [${images.length} image(s)]`);
   } catch (err) {
-    console.error('❌ Fehler beim Schreiben von', manifestPath, err.message);
+    console.error('Error writing', manifestPath, err.message);
   }
 }
 
@@ -57,7 +53,7 @@ async function walk(dir) {
   try {
     entries = await fs.readdir(dir, { withFileTypes: true });
   } catch (err) {
-    console.error('❌ readdir fehlgeschlagen in walk():', dir, err.message);
+    console.error('readdir failed in walk():', dir, err.message);
     return;
   }
 
@@ -74,9 +70,9 @@ async function scanOnce() {
 }
 
 async function watchLoop() {
-  console.log(`👀 Watch aktiv – prüfe alle ${INTERVAL_MS}ms...`);
+  console.log(`Watching ${INTERVAL_MS}ms...`);
   await scanOnce();
-  setInterval(() => scanOnce().catch(err => console.error('❌ Scan-Fehler:', err)), INTERVAL_MS);
+  setInterval(() => scanOnce().catch(err => console.error('Scan error:', err)), INTERVAL_MS);
 }
 
 (async () => {
@@ -85,11 +81,11 @@ async function watchLoop() {
       await watchLoop();
     } else {
       await scanOnce();
-      console.log('\n✅ Gallery manifests built successfully (single run).');
+      console.log('\nGallery manifests built successfully (single run).');
       console.log('===============================================');
     }
   } catch (err) {
-    console.error('\n❌ Manifest build failed:', err);
+    console.error('\nManifest build failed:', err);
     console.log('===============================================');
     process.exit(1);
   }

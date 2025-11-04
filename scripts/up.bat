@@ -5,7 +5,7 @@ echo Building gallery manifests before commit...
 echo -------------------------------------------
 node scripts/build-gallery-manifests.mjs
 IF %ERRORLEVEL% NEQ 0 (
-    echo Fehler beim Erzeugen der gallery.json, Commit abgebrochen.
+    echo Error while generating gallery.json, commit aborted.
     exit /b %ERRORLEVEL%
 )
 
