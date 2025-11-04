@@ -6,10 +6,8 @@ const __filename = url.fileURLToPath(import.meta.url);
 const ROOT = path.dirname(__filename);
 const PROJECT_ROOT = path.resolve(ROOT, '..');
 
-// Base folder: e.g. ...\public\img\applications\previews
 const IMAGES_ROOT = path.join(PROJECT_ROOT, 'public', 'img', 'applications', 'previews');
 
-// Optional: --watch --interval=1000
 const argv = process.argv.slice(2);
 const WATCH = argv.includes('--watch');
 const INTERVAL_MS = parseInt(argv.find(a => a.startsWith('--interval='))?.split('=')[1] || '1500', 10);
@@ -24,7 +22,6 @@ console.log('[DEBUG] WATCH         =', WATCH, `(${INTERVAL_MS}ms)`);
 console.log('===============================================');
 
 async function writeManifestForDir(dir) {
-  // ❌ Skip writing a manifest directly in the root "previews" directory
   if (dir === IMAGES_ROOT) {
     return;
   }
@@ -54,7 +51,6 @@ async function writeManifestForDir(dir) {
 }
 
 async function walk(dir) {
-  // Write manifest only for subdirectories, not the root
   await writeManifestForDir(dir);
 
   let entries;
@@ -89,11 +85,11 @@ async function watchLoop() {
       await watchLoop();
     } else {
       await scanOnce();
-      console.log('\n✅ Gallery manifests built successfully (single run).');
+      console.log('\nGallery manifests built successfully (single run).');
       console.log('===============================================');
     }
   } catch (err) {
-    console.error('\n❌ Manifest build failed:', err);
+    console.error('\nManifest build failed:', err);
     console.log('===============================================');
     process.exit(1);
   }
