@@ -21,10 +21,10 @@ export class PreviewSwiper {
   @ViewChild('swiperContainer') swiperContainer!: ElementRef<HTMLElement>;
 
   desktopBreakpoints: SwiperOptions['breakpoints'] = {
-    320: { slidesPerView: 3, slidesPerGroup: 3, spaceBetween: 20 },
-    600: { slidesPerView: 4, slidesPerGroup: 4, spaceBetween: 20 },
-    960: { slidesPerView: 6, slidesPerGroup: 6, spaceBetween: 20 },
-    1440: { slidesPerView: 8, slidesPerGroup: 8, spaceBetween: 20 },
+    320: { slidesPerView: 2, slidesPerGroup: 3, spaceBetween: 20 },
+    600: { slidesPerView: 3, slidesPerGroup: 4, spaceBetween: 20 },
+    960: { slidesPerView: 5, slidesPerGroup: 6, spaceBetween: 20 },
+    1440: { slidesPerView: 6, slidesPerGroup: 8, spaceBetween: 20 },
   };
 
   mobileBreakpoints: SwiperOptions['breakpoints'] = {
