@@ -22,7 +22,11 @@ import { CommonModule } from '@angular/common';
   styleUrl: './logo-swiper.scss',
 })
 export class LogoSwiper<
-  T extends { productId: string | number; productLogoFilename: string; productLogoAltText?: string }
+  T extends {
+    productId: string | number;
+    productLogoFilename: string;
+    productLogoAltText?: string;
+  }
 > {
   private deviceService = inject(DeviceService);
 

@@ -5,8 +5,7 @@
   [class.swiper--mobile-padding]="isMobileDevice"
 >
   <div class="swiper-wrapper">
-    @for (image of images; track image)
-    {
+    @for (image of images; track image) {
     <a
       class="swiper-slide"
       (click)="onClick(image)"
@@ -14,9 +13,7 @@
       (click)="$event.stopPropagation()"
     >
       <img
-        [src]="
-          'img/applications/previews/' + productPreviewsPath + '/' + image
-        "
+        [src]="'img/applications/previews/' + productPreviewsPath + '/' + image"
         [alt]="image || 'Preview'"
         loading="lazy"
         decoding="async"
