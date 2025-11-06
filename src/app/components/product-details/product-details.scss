@@ -19,3 +19,14 @@ header {
     }
   }
 }
+
+@media (width < 840px) {
+  header {
+    flex-direction: row-reverse;
+    justify-content: start;
+    img {
+      width: 72px;
+      margin: 7px 24px 0 0;
+    }
+  }
+}
