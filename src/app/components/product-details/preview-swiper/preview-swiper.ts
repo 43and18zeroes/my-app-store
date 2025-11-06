@@ -2,7 +2,7 @@ import { Component, ElementRef, inject, Input, ViewChild } from '@angular/core';
 import { DeviceService } from '../../../services/device-service';
 import { HttpClient } from '@angular/common/http';
 import Swiper from 'swiper';
-import { Navigation } from 'swiper/modules';
+import { Navigation, FreeMode } from 'swiper/modules';
 import 'swiper/swiper-bundle.css';
 import { NavigationOptions, SwiperOptions } from 'swiper/types';
 
@@ -21,16 +21,16 @@ export class PreviewSwiper {
   @ViewChild('swiperContainer') swiperContainer!: ElementRef<HTMLElement>;
 
   desktopBreakpoints: SwiperOptions['breakpoints'] = {
-    320: { slidesPerView: 2, slidesPerGroup: 3, spaceBetween: 20 },
-    600: { slidesPerView: 3, slidesPerGroup: 4, spaceBetween: 20 },
-    960: { slidesPerView: 5, slidesPerGroup: 6, spaceBetween: 20 },
-    1440: { slidesPerView: 6, slidesPerGroup: 8, spaceBetween: 20 },
+    320: { spaceBetween: 20 },
+    600: { spaceBetween: 20 },
+    960: { spaceBetween: 20 },
+    1440: { spaceBetween: 20 },
   };
 
   mobileBreakpoints: SwiperOptions['breakpoints'] = {
-    320: { slidesPerView: 3, slidesPerGroup: 3, spaceBetween: 10 },
-    600: { slidesPerView: 5, slidesPerGroup: 5, spaceBetween: 10 },
-    960: { slidesPerView: 8, slidesPerGroup: 8, spaceBetween: 10 },
+    320: { spaceBetween: 10 },
+    600: { spaceBetween: 10 },
+    960: { spaceBetween: 10 },
   };
 
   private swiper?: Swiper;
@@ -87,6 +87,14 @@ export class PreviewSwiper {
     const baseConfig: SwiperOptions = {
       modules: [Navigation],
       loop: false,
+      freeMode: {
+        enabled: true,
+        momentum: true,
+        momentumRatio: 1.0,
+        momentumBounce: false,
+        sticky: false,
+      },
+      slidesPerView: 'auto',
       navigation: {
         nextEl: nextEl as HTMLElement,
         prevEl: prevEl as HTMLElement,
