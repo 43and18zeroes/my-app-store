@@ -5,8 +5,10 @@ header {
   margin-bottom: 32px;
 
   .app__title {
-    color: #01875f;
-    font-weight: 600;
+    span {
+      color: #01875f;
+      font-weight: 500;
+    }
   }
 
   img {
