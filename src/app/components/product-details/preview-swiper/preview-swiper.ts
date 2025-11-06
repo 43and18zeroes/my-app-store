@@ -89,10 +89,10 @@ export class PreviewSwiper {
       loop: false,
       freeMode: {
         enabled: true,
-        momentum: true,
-        momentumRatio: 1.0,
+        momentumRatio: 0.5, 
+        momentumVelocityRatio: 0.5,
         momentumBounce: true,
-        momentumBounceRatio: 1, 
+        momentumBounceRatio: 1,
         sticky: false,
       },
       slidesPerView: 'auto',
