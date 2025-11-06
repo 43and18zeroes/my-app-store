@@ -2,7 +2,7 @@
 @if (item()) {
 <header>
   <h1>{{ item()!.productName }}</h1>
-  <img
+  <img class="logo__shadow"
     [src]="'img/' + productBasePath + '/logos/' + item()!.productLogoFilename"
     [alt]="item()!.productLogoAltText + ' Logo' || item()!.productId"
   />

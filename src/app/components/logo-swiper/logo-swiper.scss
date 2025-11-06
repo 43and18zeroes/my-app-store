@@ -20,44 +20,8 @@
 
     .swiper-slide {
       img {
-        display: block;
         max-width: 100%;
         border-radius: 20%;
-        box-shadow: 0 3px 5px -1px color-mix(in srgb, light-dark(#000, #fff) 10%, light-dark(#faf9fd, #121316)),
-          0 6px 10px 0
-            color-mix(
-              in srgb,
-              light-dark(#000, #fff) 10%,
-              light-dark(#faf9fd, #121316)
-            ),
-          0 1px 18px 0
-            color-mix(
-              in srgb,
-              light-dark(#000, #fff) 6%,
-              light-dark(#faf9fd, #121316)
-            );
-        transition: box-shadow 180ms ease, transform 180ms ease;
-        will-change: box-shadow, transform;
-        cursor: pointer;
-
-        &:hover,
-        &:focus {
-          box-shadow: 0 6px 7px -0.7px color-mix(in srgb, light-dark(#000, #fff)
-                  10%, light-dark(#faf9fd, #121316)),
-            0 10px 11.2px 0.7px
-              color-mix(
-                in srgb,
-                light-dark(#000, #fff) 10%,
-                light-dark(#faf9fd, #121316)
-              ),
-            0 2px 18.2px 1.4px
-              color-mix(
-                in srgb,
-                light-dark(#000, #fff) 6%,
-                light-dark(#faf9fd, #121316)
-              );
-          transform: translateY(-1px);
-        }
       }
     }
   }
