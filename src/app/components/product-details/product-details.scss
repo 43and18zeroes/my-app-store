@@ -1,11 +1,19 @@
 header {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 32px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 32px;
 
+  img {
+    width: 240px;
+    border-radius: 20%;
+  }
+}
+
+@media (width < 1280px) {
+  header {
     img {
-        width: 240px;
-        border-radius: 20%;
+      width: 180px;
     }
+  }
 }
