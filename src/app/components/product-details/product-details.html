@@ -1,7 +1,10 @@
 <!-- product-details -->
 @if (item()) {
 <header>
-  <h1>{{ item()!.productName }}</h1>
+  <div class="app__title">
+    <h1>{{ item()!.productName }}</h1>
+    <span>My {{ item()!.productName }} GmbH</span>
+  </div>
   <img class="logo__shadow"
     [src]="'img/' + productBasePath + '/logos/' + item()!.productLogoFilename"
     [alt]="item()!.productLogoAltText + ' Logo' || item()!.productId"

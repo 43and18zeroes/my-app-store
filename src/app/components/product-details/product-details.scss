@@ -4,6 +4,11 @@ header {
   justify-content: space-between;
   margin-bottom: 32px;
 
+  .app__title {
+    color: #01875f;
+    font-weight: 600;
+  }
+
   img {
     width: 240px;
     border-radius: 20%;
