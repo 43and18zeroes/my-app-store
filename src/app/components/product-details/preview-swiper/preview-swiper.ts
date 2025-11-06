@@ -85,13 +85,14 @@ export class PreviewSwiper {
     }
 
     const baseConfig: SwiperOptions = {
-      modules: [Navigation],
+      modules: [Navigation, FreeMode],
       loop: false,
       freeMode: {
         enabled: true,
         momentum: true,
         momentumRatio: 1.0,
-        momentumBounce: false,
+        momentumBounce: true,
+        momentumBounceRatio: 1, 
         sticky: false,
       },
       slidesPerView: 'auto',
