@@ -4,7 +4,7 @@
   <h1>{{ item()!.productName }}</h1>
   <img
     [src]="'img/' + productBasePath + '/logos/' + item()!.productLogoFilename"
-    [alt]="item()!.productLogoAltText || item()!.productId"
+    [alt]="item()!.productLogoAltText + ' Logo' || item()!.productId"
   />
 </header>
 <app-preview-swiper
