@@ -74,40 +74,55 @@ export class PreviewSwiper {
     const host = this.swiperContainer?.nativeElement;
     if (!host) return;
 
-    let nextEl: HTMLElement | undefined;
-    let prevEl: HTMLElement | undefined;
+    const isMobile = this.isMobileDevice;
 
-    if (!this.isMobileDevice) {
-      nextEl =
-        host.querySelector<HTMLElement>('.swiper-button-next') ?? undefined;
-      prevEl =
-        host.querySelector<HTMLElement>('.swiper-button-prev') ?? undefined;
+    let nextEl: HTMLElement | null = null;
+    let prevEl: HTMLElement | null = null;
+
+    if (!isMobile) {
+      nextEl = host.querySelector<HTMLElement>('.swiper-button-next');
+      prevEl = host.querySelector<HTMLElement>('.swiper-button-prev');
     }
+
+    const navigationCfg =
+      nextEl && prevEl ? ({ nextEl, prevEl } as NavigationOptions) : undefined;
+
+    const freeModeCfg: NonNullable<SwiperOptions['freeMode']> | false = {
+      enabled: true,
+      momentumRatio: 0.5,
+      momentumVelocityRatio: 0.5,
+      momentumBounce: true,
+      momentumBounceRatio: 1,
+      sticky: false,
+    };
 
     const baseConfig: SwiperOptions = {
       modules: [Navigation, FreeMode],
       loop: false,
-      freeMode: {
-        enabled: true,
-        momentumRatio: 0.5, 
-        momentumVelocityRatio: 0.5,
-        momentumBounce: true,
-        momentumBounceRatio: 1,
-        sticky: false,
-      },
+      freeMode: freeModeCfg,
       slidesPerView: 'auto',
-      navigation: {
-        nextEl: nextEl as HTMLElement,
-        prevEl: prevEl as HTMLElement,
-      } as NavigationOptions,
-      speed: this.isMobileDevice ? 200 : 500,
-      breakpoints: this.isMobileDevice
-        ? this.mobileBreakpoints
-        : this.desktopBreakpoints,
+      navigation: navigationCfg,
+      speed: isMobile ? 200 : 500,
+      breakpoints: isMobile ? this.mobileBreakpoints : this.desktopBreakpoints,
     };
 
     this.destroySwiper();
     this.swiper = new Swiper(host, baseConfig);
+  }
+
+  nextN(n = 1) {
+    if (!this.swiper) return;
+    this.swiper.slideTo(
+      Math.min(
+        this.swiper.activeIndex + n,
+        (this.swiper.slides?.length ?? 1) - 1
+      )
+    );
+  }
+
+  prevN(n = 1) {
+    if (!this.swiper) return;
+    this.swiper.slideTo(Math.max(this.swiper.activeIndex - n, 0));
   }
 
   private destroySwiper() {
