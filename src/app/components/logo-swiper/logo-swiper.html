@@ -9,9 +9,8 @@
     {
     <a
       class="swiper-slide"
-      (click)="onClick(thumbnailData)"
       [attr.aria-label]="thumbnailData.productLogoAltText || 'Produkt öffnen'"
-      (click)="$event.stopPropagation()"
+      (click)="$event.stopPropagation(); select.emit(thumbnailData)"
     >
       <img
         class="logo__shadow"

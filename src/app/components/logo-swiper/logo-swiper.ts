@@ -70,10 +70,6 @@ export class LogoSwiper<
     this.destroySwiper();
   }
 
-  onClick(item: T) {
-    this.select.emit(item);
-  }
-
   private initSwiper() {
     const host = this.swiperContainer?.nativeElement;
     if (!host) return;
