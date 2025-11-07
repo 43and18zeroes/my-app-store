@@ -26,6 +26,11 @@
         height: 296px;
         object-fit: cover;
         border-radius: 8px;
+
+        @media (width < 922px) {
+          width: 83px;
+          height: 148px;
+        }
       }
     }
   }
