@@ -8,9 +8,8 @@
     @for (image of images; track image) {
     <a
       class="swiper-slide no__highlight"
-      (click)="onClick(image)"
       [attr.aria-label]="image || 'Preview'"
-      (click)="$event.stopPropagation()"
+      (click)="$event.stopPropagation(); select.emit(image)"
     >
       <img
         class="logo__shadow"

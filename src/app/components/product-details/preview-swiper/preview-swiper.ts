@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, Input, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, inject, Input, Output, ViewChild } from '@angular/core';
 import { DeviceService } from '../../../services/device-service';
 import { HttpClient } from '@angular/common/http';
 import Swiper from 'swiper';
@@ -17,6 +17,7 @@ export class PreviewSwiper {
   private http = inject(HttpClient);
 
   @Input() productPreviewsPath!: string;
+  @Output() select = new EventEmitter<string>();
 
   @ViewChild('swiperContainer') swiperContainer!: ElementRef<HTMLElement>;
 
@@ -63,11 +64,6 @@ export class PreviewSwiper {
   imgSrc(file: string) {
     const p = (this.productPreviewsPath || '').replace(/^\/+/, '');
     return `${this.base}/${p}/${file}`;
-  }
-
-  onClick(image: string, ev?: MouseEvent) {
-    ev?.stopPropagation();
-    console.log('image', image);
   }
 
   private initSwiper() {
