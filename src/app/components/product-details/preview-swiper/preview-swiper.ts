@@ -21,7 +21,7 @@ export class PreviewSwiper {
 
   @ViewChild('swiperContainer') swiperContainer!: ElementRef<HTMLElement>;
 
-    lightboxOpen = false;
+  lightboxOpen = false;
   lightboxIndex = 0;
 
   desktopBreakpoints: SwiperOptions['breakpoints'] = {
@@ -134,10 +134,7 @@ export class PreviewSwiper {
     onThumbClick(event: MouseEvent, index: number) {
     event.preventDefault();
     event.stopPropagation();
-
-    // Wenn du weiterhin das ausgewählte Bild nach außen geben willst:
     this.select.emit(this.images[index]);
-
     this.openLightbox(index);
   }
 
@@ -145,8 +142,6 @@ export class PreviewSwiper {
     if (!this.images?.length) return;
     this.lightboxIndex = Math.max(0, Math.min(index, this.images.length - 1));
     this.lightboxOpen = true;
-
-    // Fokus und Scroll-Handling
     queueMicrotask(() => {
       (document.activeElement as HTMLElement)?.blur?.();
       const el = document.querySelector('.lightbox') as HTMLElement | null;
@@ -191,7 +186,6 @@ export class PreviewSwiper {
   }
 
   ngOnDestroy(): void {
-    // Falls beim Destroy noch offen
     document.body.classList.remove('no-scroll');
     this.destroySwiper();
   }
