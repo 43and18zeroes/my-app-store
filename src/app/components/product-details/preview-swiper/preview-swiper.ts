@@ -21,6 +21,9 @@ export class PreviewSwiper {
 
   @ViewChild('swiperContainer') swiperContainer!: ElementRef<HTMLElement>;
 
+    lightboxOpen = false;
+  lightboxIndex = 0;
+
   desktopBreakpoints: SwiperOptions['breakpoints'] = {
     320: { spaceBetween: 20 },
     600: { spaceBetween: 20 },
@@ -126,5 +129,70 @@ export class PreviewSwiper {
       this.swiper.destroy(true, true);
       this.swiper = undefined;
     }
+  }
+
+    onThumbClick(event: MouseEvent, index: number) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    // Wenn du weiterhin das ausgewählte Bild nach außen geben willst:
+    this.select.emit(this.images[index]);
+
+    this.openLightbox(index);
+  }
+
+  openLightbox(index: number) {
+    if (!this.images?.length) return;
+    this.lightboxIndex = Math.max(0, Math.min(index, this.images.length - 1));
+    this.lightboxOpen = true;
+
+    // Fokus und Scroll-Handling
+    queueMicrotask(() => {
+      (document.activeElement as HTMLElement)?.blur?.();
+      const el = document.querySelector('.lightbox') as HTMLElement | null;
+      el?.focus();
+    });
+    document.body.classList.add('no-scroll');
+  }
+
+  closeLightbox(event?: Event) {
+    event?.stopPropagation();
+    this.lightboxOpen = false;
+    document.body.classList.remove('no-scroll');
+  }
+
+  nextLightbox(event?: Event) {
+    event?.stopPropagation();
+    if (!this.images?.length) return;
+    this.lightboxIndex = (this.lightboxIndex + 1) % this.images.length;
+  }
+
+  prevLightbox(event?: Event) {
+    event?.stopPropagation();
+    if (!this.images?.length) return;
+    this.lightboxIndex =
+      (this.lightboxIndex - 1 + this.images.length) % this.images.length;
+  }
+
+  onLightboxKeydown(e: KeyboardEvent) {
+    switch (e.key) {
+      case 'Escape':
+        this.closeLightbox();
+        break;
+      case 'ArrowRight':
+        this.nextLightbox();
+        break;
+      case 'ArrowLeft':
+        this.prevLightbox();
+        break;
+      default:
+        break;
+    }
+  }
+
+  ngOnDestroy(): void {
+    // Falls beim Destroy noch offen
+    document.body.classList.remove('no-scroll');
+    this.destroySwiper();
   }
 }

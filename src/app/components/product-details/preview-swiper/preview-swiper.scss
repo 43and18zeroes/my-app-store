@@ -74,3 +74,55 @@
     right: 0px !important;
   }
 }
+
+/* ... deine bestehenden Styles ... */
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999; /* über Swiper-Navigation */
+  outline: none;
+
+  .lightbox__img {
+    max-width: 90vw;
+    max-height: 90vh;
+    border-radius: 8px;
+    box-shadow: 0 8px 40px rgba(0,0,0,.6);
+  }
+
+  .lightbox__btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: rgba(255,255,255,.12);
+    color: #fff;
+    font-size: 32px;
+    line-height: 1;
+    padding: 12px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    user-select: none;
+
+    &--prev { left: 24px; }
+    &--next { right: 24px; }
+    &--close {
+      top: 24px;
+      right: 24px;
+      transform: none;
+      font-size: 28px;
+      padding: 8px 12px;
+    }
+
+    &:hover { background: rgba(255,255,255,.2); }
+  }
+}
+
+/* Optional: Body-Scroll sperren, wenn Lightbox offen ist */
+body.no-scroll {
+  overflow: hidden;
+}
