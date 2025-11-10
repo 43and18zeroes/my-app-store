@@ -25,13 +25,12 @@
   }
 </div>
 
-<!-- Lightbox -->
 @if (lightboxOpen) {
 <div
   class="lightbox"
   role="dialog"
   aria-modal="true"
-  [attr.aria-label]="'Bild ' + (lightboxIndex + 1) + ' von ' + images.length"
+  [attr.aria-label]="'Image ' + (lightboxIndex + 1) + ' of ' + images.length"
   tabindex="0"
   (keydown)="onLightboxKeydown($event)"
   (click)="closeLightbox()"
@@ -39,7 +38,7 @@
   <button
     type="button"
     class="lightbox__btn lightbox__btn--close"
-    aria-label="Schließen"
+    aria-label="Close"
     (click)="closeLightbox($event)"
   >
     ×
@@ -49,7 +48,7 @@
   <button
     type="button"
     class="lightbox__btn lightbox__btn--prev"
-    aria-label="Vorheriges Bild"
+    aria-label="Previous image"
     (click)="prevLightbox($event)"
   >
     ‹
@@ -67,7 +66,7 @@
   <button
     type="button"
     class="lightbox__btn lightbox__btn--next"
-    aria-label="Nächstes Bild"
+    aria-label="Next image"
     (click)="nextLightbox($event)"
   >
     ›
