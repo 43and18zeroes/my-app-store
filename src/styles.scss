@@ -100,3 +100,7 @@ h2 {
     transform: translateY(-1px);
   }
 }
+
+.no-scroll {
+  overflow: hidden !important;
+}

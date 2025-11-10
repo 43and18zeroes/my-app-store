@@ -147,13 +147,15 @@ export class PreviewSwiper {
       const el = document.querySelector('.lightbox') as HTMLElement | null;
       el?.focus();
     });
-    document.body.classList.add('no-scroll');
+    const matSidenavContent = document.getElementsByTagName('mat-sidenav-content')[0];
+    matSidenavContent.classList.add('no-scroll');
   }
 
   closeLightbox(event?: Event) {
     event?.stopPropagation();
     this.lightboxOpen = false;
-    document.body.classList.remove('no-scroll');
+    const matSidenavContent = document.getElementsByTagName('mat-sidenav-content')[0];
+    matSidenavContent.classList.remove('no-scroll');
   }
 
   nextLightbox(event?: Event) {
