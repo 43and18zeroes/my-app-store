@@ -83,6 +83,7 @@
   justify-content: center;
   max-width: 90vw;
   max-height: 90vh;
+  touch-action: pan-y;
 
   .lightbox__img {
     max-width: 90vw;

@@ -33,7 +33,14 @@
     [attr.aria-label]="'Image ' + (lightboxIndex + 1) + ' of ' + images.length"
     tabindex="0"
     (keydown)="onLightboxKeydown($event)"
-    (click)="closeLightbox()"
+
+    (pointerdown)="lbPointerDown($event)"
+    (pointermove)="lbPointerMove($event)"
+    (pointerup)="lbPointerUp($event)"
+    (pointercancel)="lbPointerCancel($event)"
+    (pointerleave)="lbPointerCancel($event)"
+
+    (click)="onLightboxContainerClick($event)"
   >
     <button
       type="button"

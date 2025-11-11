@@ -220,6 +220,86 @@ export class PreviewSwiper {
     }
   }
 
+  private _swipe = {
+  tracking: false,
+  pointerId: -1,
+  startX: 0,
+  startY: 0,
+  deltaX: 0,
+  deltaY: 0,
+  startTs: 0,
+  justSwiped: false,
+};
+
+lbPointerDown(e: PointerEvent) {
+  // nur Touch/Pen, Maus ignorieren
+  if (e.pointerType !== 'touch' && e.pointerType !== 'pen') return;
+  this._swipe.tracking = true;
+  this._swipe.pointerId = e.pointerId;
+  this._swipe.startX = e.clientX;
+  this._swipe.startY = e.clientY;
+  this._swipe.deltaX = 0;
+  this._swipe.deltaY = 0;
+  this._swipe.startTs = performance.now();
+
+  // verhindert, dass das Event in Click umgedeutet wird
+  (e.target as Element)?.setPointerCapture?.(e.pointerId);
+}
+
+lbPointerMove(e: PointerEvent) {
+  if (!this._swipe.tracking || e.pointerId !== this._swipe.pointerId) return;
+  this._swipe.deltaX = e.clientX - this._swipe.startX;
+  this._swipe.deltaY = e.clientY - this._swipe.startY;
+
+  // Wenn horizontal deutlich dominiert, Standard verhindern (kein Scroll)
+  if (Math.abs(this._swipe.deltaX) > Math.abs(this._swipe.deltaY)) {
+    e.preventDefault();
+  }
+}
+
+lbPointerUp(e: PointerEvent) {
+  if (!this._swipe.tracking || e.pointerId !== this._swipe.pointerId) return;
+
+  const dx = this._swipe.deltaX;
+  const dy = this._swipe.deltaY;
+  const dt = performance.now() - this._swipe.startTs;
+
+  // Schwellenwerte
+  const DIST_THRESHOLD = 40;   // min. Weg in px
+  const VELO_THRESHOLD = 0.2;  // px/ms ~ 200px/s
+  const H_DOMINATES   = Math.abs(dx) > Math.abs(dy);
+
+  let handled = false;
+  if (H_DOMINATES && (Math.abs(dx) > DIST_THRESHOLD || Math.abs(dx) / dt > VELO_THRESHOLD)) {
+    handled = true;
+    if (dx < 0) this.nextLightbox(); // nach links wischen -> nächstes Bild
+    else this.prevLightbox();        // nach rechts wischen -> vorheriges Bild
+  }
+
+  this._swipe.tracking = false;
+  this._swipe.pointerId = -1;
+
+  // Klick-zu-Schließen nach Swipe unterbinden (Tap-vs-Swipe)
+  this._swipe.justSwiped = handled;
+  if (handled) {
+    setTimeout(() => (this._swipe.justSwiped = false), 80);
+  }
+}
+
+lbPointerCancel(_e: PointerEvent) {
+  this._swipe.tracking = false;
+  this._swipe.pointerId = -1;
+}
+
+onLightboxContainerClick(e: MouseEvent) {
+  // Wurde gerade geswiped? Dann NICHT schließen.
+  if (this._swipe.justSwiped) {
+    e.stopPropagation();
+    return;
+  }
+  this.closeLightbox();
+}
+
   ngOnDestroy() {
     this.overlayRef?.dispose();
     this.destroySwiper();
