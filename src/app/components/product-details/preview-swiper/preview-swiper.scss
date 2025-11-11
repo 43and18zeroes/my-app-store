@@ -85,6 +85,31 @@
   max-height: 90vh;
   touch-action: pan-y;
 
+  .lb-viewport {
+    width: 90vw;
+    max-height: 90vh;
+    overflow: hidden;
+    touch-action: pan-y; /* wir handeln X selbst */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .lb-track {
+    display: flex;
+    align-items: center;
+    will-change: transform;
+  }
+
+  .lb-img {
+    user-select: none;
+    -webkit-user-drag: none;
+    touch-action: none;
+    width: 90vw; /* jede Seite so breit wie der Viewport */
+    max-height: 90vh;
+    object-fit: contain; /* zeigt das ganze Bild */
+  }
+
   .lightbox__img {
     max-width: 90vw;
     max-height: 90vh;

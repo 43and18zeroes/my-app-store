@@ -33,13 +33,6 @@
     [attr.aria-label]="'Image ' + (lightboxIndex + 1) + ' of ' + images.length"
     tabindex="0"
     (keydown)="onLightboxKeydown($event)"
-
-    (pointerdown)="lbPointerDown($event)"
-    (pointermove)="lbPointerMove($event)"
-    (pointerup)="lbPointerUp($event)"
-    (pointercancel)="lbPointerCancel($event)"
-    (pointerleave)="lbPointerCancel($event)"
-
     (click)="onLightboxContainerClick($event)"
   >
     <button
@@ -52,18 +45,77 @@
     </button>
 
     @if (images.length > 1) {
-    <button type="button" class="lightbox__btn lightbox__btn--prev"
-            aria-label="Previous image" (click)="prevLightbox($event)">‹</button>
+    <button
+      type="button"
+      class="lightbox__btn lightbox__btn--prev"
+      aria-label="Previous image"
+      (click)="prevLightbox($event)"
+    >
+      ‹
+    </button>
     }
 
-    <img class="lightbox__img"
-         [src]="imgSrc(images[lightboxIndex])"
-         [alt]="images[lightboxIndex] || 'Preview'"
-         (click)="$event.stopPropagation()" />
+    <div
+      class="lb-viewport"
+      #lbViewport
+      (pointerdown)="lbDragStart($event)"
+      (pointermove)="lbDragMove($event)"
+      (pointerup)="lbDragEnd($event)"
+      (pointercancel)="lbDragCancel($event)"
+      (pointerleave)="lbDragCancel($event)"
+      (click)="$event.stopPropagation()"
+    >
+      <div
+        class="lb-track"
+        [style.transform]="'translate3d(' + trackX + 'px,0,0)'"
+        [style.transition]="trackTransition"
+        (transitionend)="onTrackTransitionEnd()"
+      >
+        <img
+          class="lb-img"
+          [src]="imgSrc(images[prevIndex])"
+          [alt]="images[prevIndex] || 'Prev'"
+        />
+        <img
+          class="lb-img lb-current"
+          [src]="imgSrc(images[lightboxIndex])"
+          [alt]="images[lightboxIndex] || 'Current'"
+        />
+        <img
+          class="lb-img"
+          [src]="imgSrc(images[nextIndex])"
+          [alt]="images[nextIndex] || 'Next'"
+        />
+      </div>
+    </div>
 
     @if (images.length > 1) {
-    <button type="button" class="lightbox__btn lightbox__btn--next"
-            aria-label="Next image" (click)="nextLightbox($event)">›</button>
+    <button
+      type="button"
+      class="lightbox__btn lightbox__btn--next"
+      aria-label="Next image"
+      (click)="nextLightbox($event)"
+    >
+      ›
+    </button>
+    }
+
+    <img
+      class="lightbox__img"
+      [src]="imgSrc(images[lightboxIndex])"
+      [alt]="images[lightboxIndex] || 'Preview'"
+      (click)="$event.stopPropagation()"
+    />
+
+    @if (images.length > 1) {
+    <button
+      type="button"
+      class="lightbox__btn lightbox__btn--next"
+      aria-label="Next image"
+      (click)="nextLightbox($event)"
+    >
+      ›
+    </button>
     }
   </div>
 </ng-template>
