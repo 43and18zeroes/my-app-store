@@ -150,3 +150,18 @@
     }
   }
 }
+
+.lb-track {
+  display:flex; align-items:center;
+  will-change: transform;
+  backface-visibility: hidden;
+  transform: translate3d(var(--x, 0px), 0, 0); /* <- wir setzen --x per JS */
+}
+
+.lb-img { width: 90vw; max-height: 90vh; object-fit: contain;
+  user-select:none; -webkit-user-drag:none; touch-action:none; }
+
+/* optional flüssiger Snap */
+.lb-track.is-snapping {
+  transition: transform 260ms cubic-bezier(.22,.61,.36,1);
+}

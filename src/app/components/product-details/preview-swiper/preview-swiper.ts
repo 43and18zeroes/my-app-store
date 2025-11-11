@@ -4,6 +4,7 @@ import {
   EventEmitter,
   inject,
   Input,
+  NgZone,
   Output,
   ViewChild,
 } from '@angular/core';
@@ -31,14 +32,19 @@ export class PreviewSwiper {
   @Output() select = new EventEmitter<string>();
 
   @ViewChild('swiperContainer') swiperContainer!: ElementRef<HTMLElement>;
+  @ViewChild('lbViewport') lbViewport?: ElementRef<HTMLElement>;
+  @ViewChild('lbTrack') lbTrack?: ElementRef<HTMLElement>;
+  @ViewChild('lightboxTpl') lightboxTpl!: TemplateRef<unknown>;
 
   private overlayRef?: OverlayRef;
   lightboxOpen = false;
   lightboxIndex = 0;
 
-  constructor(private overlay: Overlay, private vcr: ViewContainerRef) {}
-
-  @ViewChild('lightboxTpl') lightboxTpl!: TemplateRef<unknown>;
+  constructor(
+    private overlay: Overlay,
+    private vcr: ViewContainerRef,
+    private zone: NgZone
+  ) {}
 
   desktopBreakpoints: SwiperOptions['breakpoints'] = {
     320: { spaceBetween: 20 },
@@ -264,11 +270,13 @@ export class PreviewSwiper {
     this._swipe.pointerId = -1;
   }
 
-  @ViewChild('lbViewport') lbViewport?: ElementRef<HTMLElement>;
-
   trackX = 0; // aktuelle Track-Position (px)
   trackTransition = ''; // z.B. 'transform 250ms ease'
-  private viewportW = 0; // Breite des Viewports (px)
+  private viewportW = 0;
+  private rafId = 0;
+  private animX = 0; // aktuell gerenderte X-Position
+  private targetX = 0; // Ziel beim Snap
+  private snapping = false;
   private transitionMs = 250; // Snap-Dauer
 
   get prevIndex() {
@@ -285,14 +293,19 @@ export class PreviewSwiper {
     startY: 0,
     dx: 0,
     dy: 0,
-    startTs: 0,
-    swiped: false,
+    lastX: 0,
+    lastTs: 0,
+    vx: 0,
   };
+
+  private setX(x: number) {
+    this.animX = x;
+    this.lbTrack?.nativeElement.style.setProperty('--x', `${x}px`);
+  }
 
   private measureViewport() {
     const el = this.lbViewport?.nativeElement;
-    if (!el) return;
-    this.viewportW = el.clientWidth || 0;
+    this.viewportW = el ? el.clientWidth : 0;
   }
 
   openLightbox(index: number) {
@@ -342,88 +355,117 @@ export class PreviewSwiper {
   /* ----- Drag-Handing mit sichtbarer Bewegung ----- */
   lbDragStart(e: PointerEvent) {
     if (e.pointerType !== 'touch' && e.pointerType !== 'pen') return;
+
     this.drag.active = true;
     this.drag.id = e.pointerId;
-    this.drag.startX = e.clientX;
+    this.drag.startX = this.drag.lastX = e.clientX;
     this.drag.startY = e.clientY;
-    this.drag.dx = 0;
-    this.drag.dy = 0;
-    this.drag.startTs = performance.now();
-    this.drag.swiped = false;
-    this.trackTransition = ''; // Transition aus -> direkte Folgebewegung
+    this.drag.dx = this.drag.dy = 0;
+    this.drag.lastTs = performance.now();
+    this.snapping = false;
+    this.lbTrack?.nativeElement.classList.remove('is-snapping');
     (e.target as Element)?.setPointerCapture?.(e.pointerId);
+
+    // Messung einmalig
+    if (!this.viewportW) this.measureViewport();
   }
 
   lbDragMove(e: PointerEvent) {
     if (!this.drag.active || e.pointerId !== this.drag.id) return;
+    const now = performance.now();
+
     this.drag.dx = e.clientX - this.drag.startX;
     this.drag.dy = e.clientY - this.drag.startY;
 
-    // horizontale Dominanz -> Seite nicht scrollen
+    // horizontale Dominanz -> Scroll blocken
     if (Math.abs(this.drag.dx) > Math.abs(this.drag.dy)) e.preventDefault();
 
-    // Track live verschieben: Mitte (= aktuelles Bild) ist 0,
-    // links ist prev, rechts ist next -> wir schieben nur um dx
-    this.trackX = this.drag.dx;
+    // Velocity (für Momentum): simple sample
+    const ddx = e.clientX - this.drag.lastX;
+    const dt = Math.max(1, now - this.drag.lastTs);
+    this.drag.vx = ddx / dt; // px/ms
+
+    this.drag.lastX = e.clientX;
+    this.drag.lastTs = now;
+
+    // Schreibe transform außerhalb Angular + mit rAF
+    this.zone.runOutsideAngular(() => {
+      cancelAnimationFrame(this.rafId);
+      this.rafId = requestAnimationFrame(() => this.setX(this.drag.dx));
+    });
   }
 
   lbDragEnd(e: PointerEvent) {
     if (!this.drag.active || e.pointerId !== this.drag.id) return;
+    this.drag.active = false;
 
     const dx = this.drag.dx;
     const dy = this.drag.dy;
-    const dt = performance.now() - this.drag.startTs;
-    const v = Math.abs(dx) / Math.max(dt, 1); // px/ms
+    const v = Math.abs(this.drag.vx); // px/ms
 
-    const DIST = Math.max(40, this.viewportW * 0.18); // Strecke
+    const DIST = Math.max(40, this.viewportW * 0.18);
     const VEL = 0.25; // ~250px/s
 
     const horizontal = Math.abs(dx) > Math.abs(dy);
-    let direction: 'next' | 'prev' | null = null;
-
+    let dir: 'next' | 'prev' | null = null;
     if (horizontal && (Math.abs(dx) > DIST || v > VEL)) {
-      direction = dx < 0 ? 'next' : 'prev';
+      dir = dx < 0 ? 'next' : 'prev';
     }
 
-    this.trackTransition = `transform ${this.transitionMs}ms ease`;
-
-    if (direction === 'next') {
-      // animiere zur linken Seite (-viewportW), dann Index++ und reset
-      this.trackX = -this.viewportW;
-      this.drag.swiped = true;
-    } else if (direction === 'prev') {
-      this.trackX = this.viewportW;
-      this.drag.swiped = true;
+    // Ziel setzen
+    if (dir === 'next') {
+      this.targetX = -this.viewportW;
+    } else if (dir === 'prev') {
+      this.targetX = this.viewportW;
     } else {
-      // zurück in die Mitte snappen
-      this.trackX = 0;
+      this.targetX = 0;
     }
 
-    this.drag.active = false;
-    this.drag.id = -1;
+    // Snapping mit CSS-Transition (smooth) + Momentum-Boost
+    // Dauer dynamisch je nach Restweg/Velocity
+    const base = 220; // ms
+    const extra = Math.min(180, Math.abs(this.targetX - this.animX) / 2);
+    const dur = Math.max(160, base + extra - v * 300); // schnell -> kürzer
+
+    const track = this.lbTrack?.nativeElement;
+    if (!track) return;
+
+    this.zone.runOutsideAngular(() => {
+      track.style.transition = `transform ${dur}ms cubic-bezier(.22,.61,.36,1)`;
+      track.classList.add('is-snapping');
+      // CSS var -> transform updated by CSS, aber sicherheitshalber direkt setzen:
+      // (wir nutzen hier die CSS-Variable weiter)
+      requestAnimationFrame(() => this.setX(this.targetX));
+    });
   }
 
-  lbDragCancel(_e: PointerEvent) {
+  lbDragCancel(_: PointerEvent) {
     if (!this.drag.active) return;
     this.drag.active = false;
-    this.trackTransition = `transform ${this.transitionMs}ms ease`;
-    this.trackX = 0;
+    this.zone.runOutsideAngular(() => {
+      const track = this.lbTrack?.nativeElement;
+      if (!track) return;
+      track.style.transition = `transform 220ms cubic-bezier(.22,.61,.36,1)`;
+      track.classList.add('is-snapping');
+      requestAnimationFrame(() => this.setX(0));
+    });
   }
 
   onTrackTransitionEnd() {
-    // Wenn wir „aus dem Screen“ animiert haben, Index anpassen und Track resetten
-    if (this.trackX === -this.viewportW) {
+    const track = this.lbTrack?.nativeElement;
+    if (!track) return;
+    // Indexwechsel, wenn „aus dem Screen“ gesnappt:
+    if (this.animX === -this.viewportW) {
       this.lightboxIndex = this.nextIndex;
-    } else if (this.trackX === this.viewportW) {
+    } else if (this.animX === this.viewportW) {
       this.lightboxIndex = this.prevIndex;
     } else {
-      return; // nur Rücksnap, nichts zu tun
+      // nur zurückgeschnappt
     }
-
-    // Nach dem Indexwechsel: Track ohne Transition auf 0 setzen,
-    // damit das neue Set (prev/current/next) wieder mittig steht.
-    this.trackTransition = '';
-    this.trackX = 0;
+    // Reset
+    track.style.transition = 'none';
+    track.classList.remove('is-snapping');
+    this.setX(0);
   }
 
   onLightboxContainerClick(e: MouseEvent) {
