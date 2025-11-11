@@ -264,11 +264,6 @@ export class PreviewSwiper {
     this._swipe.pointerId = -1;
   }
 
-  ngOnDestroy() {
-    this.overlayRef?.dispose();
-    this.destroySwiper();
-  }
-
   @ViewChild('lbViewport') lbViewport?: ElementRef<HTMLElement>;
 
   trackX = 0; // aktuelle Track-Position (px)
@@ -337,7 +332,8 @@ export class PreviewSwiper {
   }
 
   ngOnDestroy() {
-    /* ... */
+    this.overlayRef?.dispose();
+    this.destroySwiper();
     window.removeEventListener('resize', this._onResize);
   }
 
