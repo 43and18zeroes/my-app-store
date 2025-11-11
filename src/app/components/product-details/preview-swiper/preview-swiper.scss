@@ -76,14 +76,13 @@
 }
 
 .lightbox {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.85);
+  position: relative;
+  outline: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
-  outline: none;
+  max-width: 90vw;
+  max-height: 90vh;
 
   .lightbox__img {
     max-width: 90vw;

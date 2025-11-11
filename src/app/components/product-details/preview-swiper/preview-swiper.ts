@@ -1,14 +1,25 @@
-import { Component, ElementRef, EventEmitter, inject, Input, Output, ViewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  inject,
+  Input,
+  Output,
+  ViewChild,
+} from '@angular/core';
 import { DeviceService } from '../../../services/device-service';
 import { HttpClient } from '@angular/common/http';
 import Swiper from 'swiper';
 import { Navigation, FreeMode } from 'swiper/modules';
 import 'swiper/swiper-bundle.css';
 import { NavigationOptions, SwiperOptions } from 'swiper/types';
+import { Overlay, OverlayRef } from '@angular/cdk/overlay';
+import { PortalModule, TemplatePortal } from '@angular/cdk/portal';
+import { ViewContainerRef, TemplateRef } from '@angular/core';
 
 @Component({
   selector: 'app-preview-swiper',
-  imports: [],
+  imports: [PortalModule],
   templateUrl: './preview-swiper.html',
   styleUrl: './preview-swiper.scss',
 })
@@ -21,8 +32,13 @@ export class PreviewSwiper {
 
   @ViewChild('swiperContainer') swiperContainer!: ElementRef<HTMLElement>;
 
+  private overlayRef?: OverlayRef;
   lightboxOpen = false;
   lightboxIndex = 0;
+
+  constructor(private overlay: Overlay, private vcr: ViewContainerRef) {}
+
+  @ViewChild('lightboxTpl') lightboxTpl!: TemplateRef<unknown>;
 
   desktopBreakpoints: SwiperOptions['breakpoints'] = {
     320: { spaceBetween: 20 },
@@ -131,7 +147,7 @@ export class PreviewSwiper {
     }
   }
 
-    onThumbClick(event: MouseEvent, index: number) {
+  onThumbClick(event: MouseEvent, index: number) {
     event.preventDefault();
     event.stopPropagation();
     this.select.emit(this.images[index]);
@@ -141,21 +157,38 @@ export class PreviewSwiper {
   openLightbox(index: number) {
     if (!this.images?.length) return;
     this.lightboxIndex = Math.max(0, Math.min(index, this.images.length - 1));
-    this.lightboxOpen = true;
-    queueMicrotask(() => {
-      (document.activeElement as HTMLElement)?.blur?.();
-      const el = document.querySelector('.lightbox') as HTMLElement | null;
-      el?.focus();
+
+    // Overlay-Konfiguration
+    const overlayConfig = this.overlay.position()
+      .global()
+      .centerHorizontally()
+      .centerVertically();
+
+    this.overlayRef = this.overlay.create({
+      hasBackdrop: true,
+      backdropClass: 'lightbox-backdrop',   // eigenes Darkening
+      positionStrategy: overlayConfig,
+      scrollStrategy: this.overlay.scrollStrategies.block()
     });
-    const matSidenavContent = document.getElementsByTagName('mat-sidenav-content')[0];
-    matSidenavContent.classList.add('no-scroll');
+
+    // Backdrop klick -> schließen
+    this.overlayRef.backdropClick().subscribe(() => this.closeLightbox());
+
+    // Template anhängen
+    const portal = new TemplatePortal(this.lightboxTpl, this.vcr);
+    this.overlayRef.attach(portal);
+
+    // Keydown (ESC/Arrows)
+    this.overlayRef.keydownEvents().subscribe((e) => this.onLightboxKeydown(e));
+
+    this.lightboxOpen = true;
   }
 
   closeLightbox(event?: Event) {
     event?.stopPropagation();
+    this.overlayRef?.dispose();
+    this.overlayRef = undefined;
     this.lightboxOpen = false;
-    const matSidenavContent = document.getElementsByTagName('mat-sidenav-content')[0];
-    matSidenavContent.classList.remove('no-scroll');
   }
 
   nextLightbox(event?: Event) {
@@ -187,8 +220,8 @@ export class PreviewSwiper {
     }
   }
 
-  ngOnDestroy(): void {
-    document.body.classList.remove('no-scroll');
+  ngOnDestroy() {
+    this.overlayRef?.dispose();
     this.destroySwiper();
   }
 }

@@ -25,52 +25,38 @@
   }
 </div>
 
-@if (lightboxOpen) {
-<div
-  class="lightbox"
-  role="dialog"
-  aria-modal="true"
-  [attr.aria-label]="'Image ' + (lightboxIndex + 1) + ' of ' + images.length"
-  tabindex="0"
-  (keydown)="onLightboxKeydown($event)"
-  (click)="closeLightbox()"
->
-  <button
-    type="button"
-    class="lightbox__btn lightbox__btn--close"
-    aria-label="Close"
-    (click)="closeLightbox($event)"
+<ng-template #lightboxTpl>
+  <div
+    class="lightbox"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-label]="'Image ' + (lightboxIndex + 1) + ' of ' + images.length"
+    tabindex="0"
+    (keydown)="onLightboxKeydown($event)"
+    (click)="closeLightbox()"
   >
-    ×
-  </button>
+    <button
+      type="button"
+      class="lightbox__btn lightbox__btn--close"
+      aria-label="Close"
+      (click)="closeLightbox($event)"
+    >
+      ×
+    </button>
 
-  @if (images.length > 1) {
-  <button
-    type="button"
-    class="lightbox__btn lightbox__btn--prev"
-    aria-label="Previous image"
-    (click)="prevLightbox($event)"
-  >
-    ‹
-  </button>
-  }
+    @if (images.length > 1) {
+    <button type="button" class="lightbox__btn lightbox__btn--prev"
+            aria-label="Previous image" (click)="prevLightbox($event)">‹</button>
+    }
 
-  <img
-    class="lightbox__img"
-    [src]="imgSrc(images[lightboxIndex])"
-    [alt]="images[lightboxIndex] || 'Preview'"
-    (click)="$event.stopPropagation()"
-  />
+    <img class="lightbox__img"
+         [src]="imgSrc(images[lightboxIndex])"
+         [alt]="images[lightboxIndex] || 'Preview'"
+         (click)="$event.stopPropagation()" />
 
-  @if (images.length > 1) {
-  <button
-    type="button"
-    class="lightbox__btn lightbox__btn--next"
-    aria-label="Next image"
-    (click)="nextLightbox($event)"
-  >
-    ›
-  </button>
-  }
-</div>
-}
+    @if (images.length > 1) {
+    <button type="button" class="lightbox__btn lightbox__btn--next"
+            aria-label="Next image" (click)="nextLightbox($event)">›</button>
+    }
+  </div>
+</ng-template>
