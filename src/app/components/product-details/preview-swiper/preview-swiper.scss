@@ -119,6 +119,7 @@
   }
 
   .lightbox__btn {
+    z-index: 1001;
     position: absolute;
     top: 50%;
     transform: translateY(-50%);

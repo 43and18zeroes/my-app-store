@@ -44,7 +44,7 @@
       ×
     </button>
 
-    @if (images.length > 1) {
+    @if (!isMobileDevice && images.length > 1) {
     <button
       type="button"
       class="lightbox__btn lightbox__btn--prev"
@@ -87,7 +87,7 @@
       </div>
     </div>
 
-    @if (images.length > 1) {
+    @if (!isMobileDevice && images.length > 1) {
     <button
       type="button"
       class="lightbox__btn lightbox__btn--next"
