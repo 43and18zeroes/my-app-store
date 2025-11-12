@@ -35,24 +35,40 @@
     (keydown)="onLightboxKeydown($event)"
     (click)="onLightboxContainerClick($event)"
   >
-    <button
+    <!-- <button
       type="button"
       class="lightbox__btn lightbox__btn--close"
       aria-label="Close"
       (click)="closeLightbox($event)"
     >
       ×
-    </button>
+    </button> -->
+    <mat-icon
+      class="lightbox__btn lightbox__btn--close"
+      [fontSet]="'material-icons'"
+      aria-label="Close"
+      (click)="closeLightbox($event)"
+    >
+      close
+    </mat-icon>
 
     @if (!isMobileDevice && images.length > 1) {
-    <button
+    <!-- <button
       type="button"
       class="lightbox__btn lightbox__btn--prev"
       aria-label="Previous image"
       (click)="prevLightbox($event)"
     >
       ‹
-    </button>
+    </button> -->
+    <mat-icon
+      class="lightbox__btn lightbox__btn--prev"
+      [fontSet]="'material-icons'"
+      aria-label="Previous image"
+      (click)="prevLightbox($event)"
+    >
+      chevron_left
+    </mat-icon>
     }
 
     <div
@@ -88,14 +104,22 @@
     </div>
 
     @if (!isMobileDevice && images.length > 1) {
-    <button
+    <!-- <button
       type="button"
       class="lightbox__btn lightbox__btn--next"
       aria-label="Next image"
       (click)="nextLightbox($event)"
     >
       ›
-    </button>
+    </button> -->
+    <mat-icon
+      class="lightbox__btn lightbox__btn--next"
+      [fontSet]="'material-icons'"
+      aria-label="Previous image"
+      (click)="prevLightbox($event)"
+    >
+      chevron_right
+    </mat-icon>
     }
   </div>
 </ng-template>

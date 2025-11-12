@@ -123,15 +123,17 @@
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    border: none;
-    background: rgba(255, 255, 255, 0.12);
-    color: #fff;
-    font-size: 32px;
-    line-height: 1;
-    padding: 12px 16px;
-    border-radius: 8px;
+    // border: none;
+    // background: rgba(255, 255, 255, 0.12);
+    // color: #fff;
+    // font-size: 32px;
+    // line-height: 1;
+    // padding: 12px 16px;
+    // border-radius: 8px;
     cursor: pointer;
-    user-select: none;
+    // user-select: none;
+    // box-shadow: 0 0 4px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.25),
+    //   0 0 0 1px rgba(255, 255, 255, 0.2) inset;
 
     &--prev {
       left: 24px;
@@ -142,14 +144,14 @@
     &--close {
       top: 24px;
       right: 24px;
-      transform: none;
-      font-size: 28px;
-      padding: 8px 12px;
+      // transform: none;
+      // font-size: 28px;
+      // padding: 8px 12px;
     }
 
-    &:hover {
-      background: rgba(255, 255, 255, 0.2);
-    }
+    // &:hover {
+    //   background: rgba(255, 255, 255, 0.2);
+    // }
   }
 }
 

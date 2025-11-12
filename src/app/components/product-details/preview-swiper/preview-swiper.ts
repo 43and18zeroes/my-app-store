@@ -17,10 +17,11 @@ import { NavigationOptions, SwiperOptions } from 'swiper/types';
 import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { PortalModule, TemplatePortal } from '@angular/cdk/portal';
 import { ViewContainerRef, TemplateRef } from '@angular/core';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-preview-swiper',
-  imports: [PortalModule],
+  imports: [PortalModule, MatIconModule],
   templateUrl: './preview-swiper.html',
   styleUrl: './preview-swiper.scss',
 })
