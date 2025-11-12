@@ -123,6 +123,12 @@
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
+    width: 60px;
+    height: 60px;
+    font-size: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     // border: none;
     // background: rgba(255, 255, 255, 0.12);
     // color: #fff;
@@ -136,14 +142,14 @@
     //   0 0 0 1px rgba(255, 255, 255, 0.2) inset;
 
     &--prev {
-      left: 24px;
+      left: 0;
     }
     &--next {
-      right: 24px;
+      right: 0;
     }
     &--close {
-      top: 24px;
-      right: 24px;
+      top: 0;
+      right: 0;
       // transform: none;
       // font-size: 28px;
       // padding: 8px 12px;
