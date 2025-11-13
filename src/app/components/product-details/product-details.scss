@@ -2,6 +2,8 @@ header {
   width: 100%;
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
+  gap: 32px;
   margin-bottom: 32px;
 
   .app__info {
