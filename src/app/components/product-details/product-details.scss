@@ -4,7 +4,7 @@ header {
   justify-content: space-between;
   align-items: flex-start;
   gap: 32px;
-  margin-bottom: 32px;
+  margin-bottom: 48px;
 
   .app__info {
     span {
@@ -27,6 +27,8 @@ header {
 
 @media (width < 1280px) {
   header {
+    margin-bottom: 16px;
+
     img {
       width: 180px;
     }
@@ -38,6 +40,7 @@ header {
     flex-direction: row-reverse;
     justify-content: start;
     gap: 0;
+    margin-bottom: 16px;
 
     .app__info {
       .descriptionDesktop {
@@ -53,5 +56,13 @@ header {
 
   .descriptionMobile {
     display: block;
+  }
+}
+
+@media (width < 600px) {
+  header {
+    img {
+      margin-right: 16px;
+    }
   }
 }
