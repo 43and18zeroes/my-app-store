@@ -21,6 +21,10 @@ header {
   }
 }
 
+.descriptionMobile {
+  display: none;
+}
+
 @media (width < 1280px) {
   header {
     img {
@@ -33,9 +37,18 @@ header {
   header {
     flex-direction: row-reverse;
     justify-content: start;
+    .app__info {
+      .descriptionDesktop {
+        display: none;
+      }
+    }
     img {
       width: 72px;
       margin: 7px 24px 0 0;
     }
   }
+
+.descriptionMobile {
+  display: block;
+}
 }

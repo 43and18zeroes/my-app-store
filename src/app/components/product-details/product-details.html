@@ -4,14 +4,16 @@
   <div class="app__info">
     <h1>{{ item()!.productName }}</h1>
     <span>My {{ item()!.productName }} GmbH</span>
-    <p>{{ item()!.productDescription }}</p>
-    <p>{{ item()!.productDescription2 }}</p>
+    <p class="descriptionDesktop">{{ item()!.productDescription }}</p>
+    <p class="descriptionDesktop">{{ item()!.productDescription2 }}</p>
   </div>
-  <img class="logo__shadow"
+  <img
+    class="logo__shadow"
     [src]="'img/' + productBasePath + '/logos/' + item()!.productLogoFilename"
     [alt]="item()!.productLogoAltText + ' Logo' || item()!.productId"
   />
 </header>
+<p class="descriptionMobile">{{ item()!.productDescription }}</p>
 <app-preview-swiper
   [productPreviewsPath]="item()?.productPreviewsPath || ''"
 ></app-preview-swiper>
