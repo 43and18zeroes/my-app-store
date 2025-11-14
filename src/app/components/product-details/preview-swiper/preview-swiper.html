@@ -45,6 +45,7 @@
     </button> -->
     <mat-icon
       class="lightbox__btn lightbox__btn--close no__highlight"
+      [class.btn__mobile]="isMobileDevice"
       [fontSet]="'material-icons'"
       aria-label="Close"
       (click)="closeLightbox($event)"
