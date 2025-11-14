@@ -90,7 +90,7 @@
     width: 90vw;
     max-height: 90vh;
     overflow: hidden;
-    touch-action: pan-y; /* wir handeln X selbst */
+    touch-action: pan-y;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -106,9 +106,9 @@
     user-select: none;
     -webkit-user-drag: none;
     touch-action: none;
-    width: 90vw; /* jede Seite so breit wie der Viewport */
+    width: 90vw;
     max-height: 90vh;
-    object-fit: contain; /* zeigt das ganze Bild */
+    object-fit: contain;
   }
 
   .lightbox__img {
@@ -129,18 +129,11 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    // border: none;
     background-color: rgba(0, 0, 0, 0.54);
     border-radius: 100%;
-    // color: #fff;
-    // font-size: 32px;
-    // line-height: 1;
-    // padding: 12px 16px;
-    // border-radius: 8px;
+    color: #868686;
+    transition: color 240ms cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
-    // user-select: none;
-    // box-shadow: 0 0 4px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.25),
-    //   0 0 0 1px rgba(255, 255, 255, 0.2) inset;
 
     &--prev {
       left: 0;
@@ -149,16 +142,13 @@
       right: 0;
     }
     &--close {
-      top: 0;
+      top: 10px;
       right: 0;
-      // transform: none;
-      // font-size: 28px;
-      // padding: 8px 12px;
     }
 
-    // &:hover {
-    //   background: rgba(255, 255, 255, 0.2);
-    // }
+    &:hover {
+      color: #cacaca;
+    }
   }
 }
 
@@ -167,7 +157,7 @@
   align-items: center;
   will-change: transform;
   backface-visibility: hidden;
-  transform: translate3d(var(--x, 0px), 0, 0); /* <- wir setzen --x per JS */
+  transform: translate3d(var(--x, 0px), 0, 0);
   gap: var(--lb-gap);
 }
 
@@ -180,7 +170,6 @@
   touch-action: none;
 }
 
-/* optional flüssiger Snap */
 .lb-track.is-snapping {
   transition: transform 260ms cubic-bezier(0.22, 0.61, 0.36, 1);
 }
