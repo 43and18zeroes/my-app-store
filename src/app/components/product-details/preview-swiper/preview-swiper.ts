@@ -161,6 +161,13 @@ export class PreviewSwiper {
     this.openLightbox(index);
   }
 
+  onClosePointerUp(e: PointerEvent) {
+  e.stopPropagation();
+  e.preventDefault();
+
+  this.closeLightbox();
+}
+
   closeLightbox(event?: Event) {
     event?.stopPropagation();
     this.overlayRef?.dispose();

@@ -48,7 +48,7 @@
       [class.btn__mobile]="isMobileDevice"
       [fontSet]="'material-icons'"
       aria-label="Close"
-      (click)="closeLightbox($event)"
+      (pointerup)="onClosePointerUp($event)"
     >
       close
     </mat-icon>
