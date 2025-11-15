@@ -28,6 +28,7 @@
 <ng-template #lightboxTpl>
   <div
     class="lightbox"
+    [class.lightbox__mobile]="isMobileDevice"
     role="dialog"
     aria-modal="true"
     [attr.aria-label]="'Image ' + (lightboxIndex + 1) + ' of ' + images.length"
@@ -74,6 +75,7 @@
 
     <div
       class="lb-viewport"
+      [class.lb-viewport__mobile]="isMobileDevice"
       #lbViewport
       (pointerdown)="lbDragStart($event)"
       (pointermove)="lbDragMove($event)"
@@ -85,18 +87,21 @@
       <div class="lb-track" #lbTrack (transitionend)="onTrackTransitionEnd()">
         <img
           class="lb-img"
+          [class.lb-img__mobile]="isMobileDevice"
           [attr.draggable]="false"
           [src]="imgSrc(images[prevIndex])"
           [alt]="images[prevIndex] || 'Prev'"
         />
         <img
           class="lb-img lb-current"
+          [class.lb-img__mobile]="isMobileDevice"
           [attr.draggable]="false"
           [src]="imgSrc(images[lightboxIndex])"
           [alt]="images[lightboxIndex] || 'Current'"
         />
         <img
           class="lb-img"
+          [class.lb-img__mobile]="isMobileDevice"
           [attr.draggable]="false"
           [src]="imgSrc(images[nextIndex])"
           [alt]="images[nextIndex] || 'Next'"
