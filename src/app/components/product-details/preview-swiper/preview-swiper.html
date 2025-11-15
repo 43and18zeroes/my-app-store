@@ -81,7 +81,6 @@
       (pointermove)="lbDragMove($event)"
       (pointerup)="lbDragEnd($event)"
       (pointercancel)="lbDragCancel($event)"
-      (pointerleave)="lbDragCancel($event)"
       (click)="$event.stopPropagation()"
     >
       <div class="lb-track" #lbTrack (transitionend)="onTrackTransitionEnd()">

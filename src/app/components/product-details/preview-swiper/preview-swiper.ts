@@ -162,11 +162,11 @@ export class PreviewSwiper {
   }
 
   onClosePointerUp(e: PointerEvent) {
-  e.stopPropagation();
-  e.preventDefault();
+    e.stopPropagation();
+    e.preventDefault();
 
-  this.closeLightbox();
-}
+    this.closeLightbox();
+  }
 
   closeLightbox(event?: Event) {
     event?.stopPropagation();
@@ -462,18 +462,24 @@ export class PreviewSwiper {
   onTrackTransitionEnd() {
     const track = this.lbTrack?.nativeElement;
     if (!track) return;
-    // Indexwechsel, wenn „aus dem Screen“ gesnappt:
-    if (this.animX === -this.viewportW) {
-      this.lightboxIndex = this.nextIndex;
-    } else if (this.animX === this.viewportW) {
-      this.lightboxIndex = this.prevIndex;
-    } else {
-      // nur zurückgeschnappt
-    }
-    // Reset
+
+    const goNext = this.animX === -this.viewportW;
+    const goPrev = this.animX === this.viewportW;
+
+    // Transition aus
     track.style.transition = 'none';
     track.classList.remove('is-snapping');
-    this.setX(0);
+
+    // Indexwechsel + Transform-Reset im nächsten Frame
+    this.zone.run(() => {
+      if (goNext) {
+        this.lightboxIndex = this.nextIndex;
+      } else if (goPrev) {
+        this.lightboxIndex = this.prevIndex;
+      }
+
+      requestAnimationFrame(() => this.setX(0));
+    });
   }
 
   onLightboxContainerClick(e: MouseEvent) {
