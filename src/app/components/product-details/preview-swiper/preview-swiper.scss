@@ -103,12 +103,12 @@
   }
 
   .lb-img {
+    width: calc(90vw - var(--lb-gap));
+    max-height: 90vh;
+    object-fit: contain;
     user-select: none;
     -webkit-user-drag: none;
     touch-action: none;
-    width: 90vw;
-    max-height: 90vh;
-    object-fit: contain;
   }
 
   .lightbox__img {
@@ -163,15 +163,6 @@
   backface-visibility: hidden;
   transform: translate3d(var(--x, 0px), 0, 0);
   gap: var(--lb-gap);
-}
-
-.lb-img {
-  width: calc(90vw - var(--lb-gap));
-  max-height: 90vh;
-  object-fit: contain;
-  user-select: none;
-  -webkit-user-drag: none;
-  touch-action: none;
 }
 
 .lightbox__mobile {
