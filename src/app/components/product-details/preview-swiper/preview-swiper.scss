@@ -161,7 +161,6 @@
   align-items: center;
   will-change: transform;
   backface-visibility: hidden;
-  transform: translate3d(var(--x, 0px), 0, 0);
   gap: var(--lb-gap);
 }
 

@@ -308,12 +308,19 @@ export class PreviewSwiper {
 
   private setX(x: number) {
     this.animX = x;
-    this.lbTrack?.nativeElement.style.setProperty('--x', `${x}px`);
+    const track = this.lbTrack?.nativeElement;
+    if (!track) return;
+
+    // Basis: aktuelles Bild liegt in der Mitte => -viewportW
+    const base = -this.viewportW;
+    track.style.transform = `translate3d(${base + x}px, 0, 0)`;
   }
 
   private measureViewport() {
     const el = this.lbViewport?.nativeElement;
     this.viewportW = el ? el.clientWidth : 0;
+    // direkt sauber zentrieren
+    this.setX(0);
   }
 
   openLightbox(index: number) {
@@ -459,28 +466,28 @@ export class PreviewSwiper {
     });
   }
 
-  onTrackTransitionEnd() {
-    const track = this.lbTrack?.nativeElement;
-    if (!track) return;
+onTrackTransitionEnd() {
+  const track = this.lbTrack?.nativeElement;
+  if (!track) return;
 
-    const goNext = this.animX === -this.viewportW;
-    const goPrev = this.animX === this.viewportW;
+  const goNext = this.animX === -this.viewportW;
+  const goPrev = this.animX === this.viewportW;
 
-    // Transition aus
-    track.style.transition = 'none';
-    track.classList.remove('is-snapping');
+  track.style.transition = 'none';
+  track.classList.remove('is-snapping');
 
-    // Indexwechsel + Transform-Reset im nächsten Frame
-    this.zone.run(() => {
-      if (goNext) {
-        this.lightboxIndex = this.nextIndex;
-      } else if (goPrev) {
-        this.lightboxIndex = this.prevIndex;
-      }
+  this.zone.run(() => {
+    if (goNext) {
+      this.lightboxIndex = this.nextIndex;
+    } else if (goPrev) {
+      this.lightboxIndex = this.prevIndex;
+    }
 
-      requestAnimationFrame(() => this.setX(0));
-    });
-  }
+    // wieder in die Mitte – aber jetzt ist "Mitte" schon das neue current Bild
+    this.setX(0);
+  });
+}
+
 
   onLightboxContainerClick(e: MouseEvent) {
     // Wurde gerade geswiped? Dann NICHT schließen.
