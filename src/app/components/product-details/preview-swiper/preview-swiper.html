@@ -8,6 +8,7 @@
     <a
       class="swiper-slide no__highlight"
       [attr.aria-label]="image || 'Preview'"
+      (click)="openLightbox(i); $event.preventDefault()"
     >
       <img
         class="logo__shadow"
@@ -23,3 +24,11 @@
   <div class="swiper-button-next" (click)="nextN(3)"></div>
   }
 </div>
+
+@if (lightboxOpen) {
+  <app-lightbox
+    [images]="lightboxImages"
+    [startIndex]="lightboxIndex"
+    (closed)="closeLightbox()"
+  />
+}

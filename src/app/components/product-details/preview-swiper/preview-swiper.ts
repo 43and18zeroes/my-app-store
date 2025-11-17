@@ -16,10 +16,11 @@ import { NavigationOptions, SwiperOptions } from 'swiper/types';
 import { PortalModule } from '@angular/cdk/portal';
 import { TemplateRef } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
+import { Lightbox } from './lightbox/lightbox';
 
 @Component({
   selector: 'app-preview-swiper',
-  imports: [PortalModule, MatIconModule],
+  imports: [PortalModule, MatIconModule, Lightbox],
   templateUrl: './preview-swiper.html',
   styleUrl: './preview-swiper.scss',
 })
@@ -35,12 +36,7 @@ export class PreviewSwiper {
   @ViewChild('lbTrack') lbTrack?: ElementRef<HTMLElement>;
   @ViewChild('lightboxTpl') lightboxTpl!: TemplateRef<unknown>;
 
-  lightboxOpen = false;
-  lightboxIndex = 0;
-
-  constructor(
-
-  ) {}
+  constructor() {}
 
   desktopBreakpoints: SwiperOptions['breakpoints'] = {
     320: { spaceBetween: 20 },
@@ -147,5 +143,23 @@ export class PreviewSwiper {
       this.swiper.destroy(true, true);
       this.swiper = undefined;
     }
+  }
+
+  // Lightbox
+
+  lightboxOpen = false;
+  lightboxIndex = 0;
+
+    get lightboxImages(): string[] {
+    return this.images.map((img) => this.imgSrc(img));
+  }
+
+  openLightbox(index: number) {
+    this.lightboxIndex = index;
+    this.lightboxOpen = true;
+  }
+
+  closeLightbox() {
+    this.lightboxOpen = false;
   }
 }

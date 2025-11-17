@@ -1,0 +1,36 @@
+<!-- lightbox.html -->
+<div class="lightbox" role="dialog" aria-modal="true">
+  <button
+    type="button"
+    class="lightbox__close"
+    (click)="close()"
+    aria-label="Close lightbox"
+  >
+    <mat-icon>close</mat-icon>
+  </button>
+
+  <button
+    type="button"
+    class="lightbox__nav lightbox__nav--prev"
+    (click)="prev()"
+    aria-label="Previous image"
+  >
+    <mat-icon>chevron_left</mat-icon>
+  </button>
+
+  <img
+    *ngIf="currentImage as src"
+    class="lightbox__image"
+    [src]="src"
+    alt="Image preview"
+  />
+
+  <button
+    type="button"
+    class="lightbox__nav lightbox__nav--next"
+    (click)="next()"
+    aria-label="Next image"
+  >
+    <mat-icon>chevron_right</mat-icon>
+  </button>
+</div>
