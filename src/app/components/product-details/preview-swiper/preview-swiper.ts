@@ -146,7 +146,6 @@ export class PreviewSwiper {
   }
 
   // Lightbox
-
   lightboxOpen = false;
   lightboxIndex = 0;
 
