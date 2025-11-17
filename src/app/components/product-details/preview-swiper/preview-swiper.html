@@ -8,7 +8,6 @@
     <a
       class="swiper-slide no__highlight"
       [attr.aria-label]="image || 'Preview'"
-      (click)="onThumbClick($event, i)"
     >
       <img
         class="logo__shadow"
@@ -25,7 +24,7 @@
   }
 </div>
 
-<ng-template #lightboxTpl>
+<!-- <ng-template #lightboxTpl>
   <div
     class="lightbox"
     [class.lightbox__mobile]="isMobileDevice"
@@ -36,14 +35,6 @@
     (keydown)="onLightboxKeydown($event)"
     (click)="onLightboxContainerClick($event)"
   >
-    <!-- <button
-      type="button"
-      class="lightbox__btn lightbox__btn--close"
-      aria-label="Close"
-      (click)="closeLightbox($event)"
-    >
-      ×
-    </button> -->
     <mat-icon
       class="lightbox__btn lightbox__btn--close no__highlight"
       [class.btn__mobile]="isMobileDevice"
@@ -55,14 +46,6 @@
     </mat-icon>
 
     @if (!isMobileDevice && images.length > 1) {
-    <!-- <button
-      type="button"
-      class="lightbox__btn lightbox__btn--prev"
-      aria-label="Previous image"
-      (click)="prevLightbox($event)"
-    >
-      ‹
-    </button> -->
     <mat-icon
       class="lightbox__btn lightbox__btn--prev no__highlight"
       [fontSet]="'material-icons'"
@@ -109,14 +92,6 @@
     </div>
 
     @if (!isMobileDevice && images.length > 1) {
-    <!-- <button
-      type="button"
-      class="lightbox__btn lightbox__btn--next"
-      aria-label="Next image"
-      (click)="nextLightbox($event)"
-    >
-      ›
-    </button> -->
     <mat-icon
       class="lightbox__btn lightbox__btn--next no__highlight"
       [fontSet]="'material-icons'"
@@ -127,4 +102,4 @@
     </mat-icon>
     }
   </div>
-</ng-template>
+</ng-template> -->
