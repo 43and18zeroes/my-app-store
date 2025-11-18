@@ -1,5 +1,5 @@
 {
-  "name": "my-app-store",
+  "name": "my-app-shop",
   "version": "0.0.0",
   "scripts": {
     "prebuild": "node scripts/build-gallery-manifests.mjs",

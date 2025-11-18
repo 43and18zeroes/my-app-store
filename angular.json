@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "my-app-store": {
+    "my-app-shop": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -61,10 +61,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "my-app-store:build:production"
+              "buildTarget": "my-app-shop:build:production"
             },
             "development": {
-              "buildTarget": "my-app-store:build:development"
+              "buildTarget": "my-app-shop:build:development"
             }
           },
           "defaultConfiguration": "development"
