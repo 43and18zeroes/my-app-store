@@ -2,17 +2,36 @@
   position: fixed;
   inset: 0;
   z-index: 1000;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.0); // Start: transparent
 
   display: flex;
   align-items: center;
   justify-content: center;
+
+  // Fade-In fürs Overlay
+  opacity: 0;
+  transition: opacity 200ms ease-out, background 200ms ease-out;
+
+  &--visible {
+    opacity: 1;
+    background: rgba(0, 0, 0, 0.8);
+  }
 
   &__image {
     max-width: 90vw;
     max-height: 90vh;
     border-radius: 8px;
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+
+    // Startzustand für Zoom
+    transform: scale(0.8);
+    opacity: 0;
+    transition: transform 200ms ease-out, opacity 200ms ease-out;
+  }
+
+  &__image--visible {
+    transform: scale(1);
+    opacity: 1;
   }
 
   &__close {

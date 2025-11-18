@@ -15,12 +15,18 @@ export class Lightbox {
   @Output() closed = new EventEmitter<void>();
 
   currentIndex = 0;
+  isVisible = false;
 
   ngOnInit() {
     this.currentIndex =
       this.startIndex >= 0 && this.startIndex < this.images.length
         ? this.startIndex
         : 0;
+
+    // Nächster Tick → CSS-Transition kann von "hidden" nach "visible" animieren
+    setTimeout(() => {
+      this.isVisible = true;
+    }, 0);
   }
 
   get currentImage(): string | null {

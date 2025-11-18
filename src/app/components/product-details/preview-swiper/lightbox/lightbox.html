@@ -1,5 +1,10 @@
 <!-- lightbox.html -->
-<div class="lightbox" role="dialog" aria-modal="true">
+<div
+  class="lightbox"
+  [class.lightbox--visible]="isVisible"
+  role="dialog"
+  aria-modal="true"
+>
   <button
     type="button"
     class="lightbox__close"
@@ -21,6 +26,7 @@
   <img
     *ngIf="currentImage as src"
     class="lightbox__image"
+    [class.lightbox__image--visible]="isVisible"
     [src]="src"
     alt="Image preview"
   />
