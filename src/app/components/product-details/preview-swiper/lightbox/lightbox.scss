@@ -9,7 +9,6 @@
   justify-content: center;
 
   opacity: 0;
-  transition: opacity 200ms ease-out, background 200ms ease-out;
 
   &--visible {
     opacity: 1;

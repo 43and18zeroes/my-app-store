@@ -8,6 +8,9 @@ import {
 } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 
+const duration = '300ms';
+const easing = 'ease-in-out';
+
 @Component({
   selector: 'app-lightbox',
   imports: [NgIf, NgStyle, MatIconModule],
@@ -44,7 +47,7 @@ export class Lightbox {
         top: sr.top + 'px',
         width: sr.width + 'px',
         height: sr.height + 'px',
-        transition: 'all 300ms ease-out',
+        transition: `all ${duration} ${easing}`,
       };
 
       // Ziel-Rect: in der Mitte, maximal 90% des Viewports, gleiches Seitenverhältnis
@@ -67,7 +70,7 @@ export class Lightbox {
         top: finalTop + 'px',
         width: finalWidth + 'px',
         height: finalHeight + 'px',
-        transition: 'all 300ms ease-out',
+        transition: `all ${duration} ${easing}`,
       };
     } else {
       // Fallback: aus der Mitte heraus zoomen
@@ -83,7 +86,7 @@ export class Lightbox {
         width: finalWidth + 'px',
         height: finalHeight + 'px',
         transform: 'scale(0.8)',
-        transition: 'all 300ms ease-out',
+        transition: `all ${duration} ${easing}`,
       };
 
       this.finalStyles = {
@@ -93,7 +96,7 @@ export class Lightbox {
         width: finalWidth + 'px',
         height: finalHeight + 'px',
         transform: 'scale(1)',
-        transition: 'all 300ms ease-out',
+        transition: `all ${duration} ${easing}`,
       };
     }
 
