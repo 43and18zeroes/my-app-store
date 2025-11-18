@@ -23,7 +23,9 @@ export class Lightbox {
 
   currentIndex = 0;
   isVisible = false;
+
   zoomStyles: Record<string, string> = {};
+  finalStyles: Record<string, string> = {};
   animateToFinal = false;
 
   ngOnInit() {
@@ -33,49 +35,77 @@ export class Lightbox {
         : 0;
 
     if (this.startRect) {
+      // Ausgangs-Rect (Thumbnail)
+      const sr = this.startRect;
+
       this.zoomStyles = {
         position: 'fixed',
-        left: this.startRect.left + 'px',
-        top: this.startRect.top + 'px',
-        width: this.startRect.width + 'px',
-        height: this.startRect.height + 'px',
-        transform: 'none',
+        left: sr.left + 'px',
+        top: sr.top + 'px',
+        width: sr.width + 'px',
+        height: sr.height + 'px',
+        transition: 'all 300ms ease-out',
+      };
+
+      // Ziel-Rect: in der Mitte, maximal 90% des Viewports, gleiches Seitenverhältnis
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+
+      const maxWidth = vw * 0.9;
+      const maxHeight = vh * 0.9;
+
+      const scale = Math.min(maxWidth / sr.width, maxHeight / sr.height);
+      const finalWidth = sr.width * scale;
+      const finalHeight = sr.height * scale;
+
+      const finalLeft = vw / 2 - finalWidth / 2;
+      const finalTop = vh / 2 - finalHeight / 2;
+
+      this.finalStyles = {
+        position: 'fixed',
+        left: finalLeft + 'px',
+        top: finalTop + 'px',
+        width: finalWidth + 'px',
+        height: finalHeight + 'px',
         transition: 'all 300ms ease-out',
       };
     } else {
-      // Fallback: aus der Mitte leicht vergrößern
+      // Fallback: aus der Mitte heraus zoomen
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const finalWidth = vw * 0.9;
+      const finalHeight = vh * 0.9;
+
       this.zoomStyles = {
         position: 'fixed',
-        left: '50%',
-        top: '50%',
-        width: '40vw',
-        height: 'auto',
-        transform: 'translate(-50%, -50%) scale(0.8)',
+        left: vw / 2 - finalWidth / 2 + 'px',
+        top: vh / 2 - finalHeight / 2 + 'px',
+        width: finalWidth + 'px',
+        height: finalHeight + 'px',
+        transform: 'scale(0.8)',
+        transition: 'all 300ms ease-out',
+      };
+
+      this.finalStyles = {
+        position: 'fixed',
+        left: vw / 2 - finalWidth / 2 + 'px',
+        top: vh / 2 - finalHeight / 2 + 'px',
+        width: finalWidth + 'px',
+        height: finalHeight + 'px',
+        transform: 'scale(1)',
         transition: 'all 300ms ease-out',
       };
     }
 
-    // 2. Nächster Tick → Overlay + Bild in Endposition animieren
+    // Nächster Tick → Overlay + Bild animieren
     setTimeout(() => {
-      this.isVisible = true; // 👈 macht Overlay dunkel
-      this.animateToFinal = true; // 👈 triggert Zoom zu finalStyles
+      this.isVisible = true;
+      this.animateToFinal = true;
     }, 10);
   }
 
   get currentImage(): string | null {
     return this.images[this.currentIndex] ?? null;
-  }
-
-  get finalStyles(): Record<string, string> {
-    return {
-      position: 'fixed',
-      left: '50%',
-      top: '50%',
-      width: '90vw',
-      height: 'auto',
-      transform: 'translate(-50%, -50%)',
-      transition: 'all 300ms ease-out',
-    };
   }
 
   next() {
