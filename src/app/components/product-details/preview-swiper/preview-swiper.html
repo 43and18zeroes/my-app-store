@@ -8,7 +8,7 @@
     <a
       class="swiper-slide no__highlight"
       [attr.aria-label]="image || 'Preview'"
-      (click)="openLightbox(i); $event.preventDefault()"
+      (click)="openLightbox(i, $event); $event.preventDefault()"
     >
       <img
         class="logo__shadow"
@@ -26,9 +26,10 @@
 </div>
 
 @if (lightboxOpen) {
-  <app-lightbox
-    [images]="lightboxImages"
-    [startIndex]="lightboxIndex"
-    (closed)="closeLightbox()"
-  />
+<app-lightbox
+  [images]="lightboxImages"
+  [startIndex]="lightboxIndex"
+  [startRect]="lightboxStartRect"
+  (closed)="closeLightbox()"
+/>
 }

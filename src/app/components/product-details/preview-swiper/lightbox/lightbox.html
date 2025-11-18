@@ -26,9 +26,9 @@
   <img
     *ngIf="currentImage as src"
     class="lightbox__image"
-    [class.lightbox__image--visible]="isVisible"
     [src]="src"
     alt="Image preview"
+    [ngStyle]="animateToFinal ? finalStyles : zoomStyles"
   />
 
   <button

@@ -148,12 +148,21 @@ export class PreviewSwiper {
   // Lightbox
   lightboxOpen = false;
   lightboxIndex = 0;
+  lightboxStartRect?: DOMRect;
 
-    get lightboxImages(): string[] {
+  get lightboxImages(): string[] {
     return this.images.map((img) => this.imgSrc(img));
   }
 
-  openLightbox(index: number) {
+  openLightbox(index: number, event: MouseEvent) {
+    const target = event.currentTarget as HTMLElement;
+    const img = target.querySelector('img');
+
+    if (img) {
+      const rect = img.getBoundingClientRect();
+      this.lightboxStartRect = rect;
+    }
+
     this.lightboxIndex = index;
     this.lightboxOpen = true;
   }
