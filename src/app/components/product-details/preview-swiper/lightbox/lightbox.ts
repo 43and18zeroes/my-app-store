@@ -32,7 +32,6 @@ export class Lightbox {
         ? this.startIndex
         : 0;
 
-    // 1. Startposition = Position des Thumbnails
     if (this.startRect) {
       this.zoomStyles = {
         position: 'fixed',
