@@ -16,17 +16,18 @@ import { NavigationOptions, SwiperOptions } from 'swiper/types';
 import { PortalModule } from '@angular/cdk/portal';
 import { TemplateRef } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
-import { Lightbox } from './lightbox/lightbox';
+import { LightboxService } from './lightbox/lightbox-service';
 
 @Component({
   selector: 'app-preview-swiper',
-  imports: [PortalModule, MatIconModule, Lightbox],
+  imports: [PortalModule, MatIconModule],
   templateUrl: './preview-swiper.html',
   styleUrl: './preview-swiper.scss',
 })
 export class PreviewSwiper {
   private deviceService = inject(DeviceService);
   private http = inject(HttpClient);
+  private lightbox = inject(LightboxService);
 
   @Input() productPreviewsPath!: string;
   @Output() select = new EventEmitter<string>();
@@ -154,17 +155,25 @@ export class PreviewSwiper {
     return this.images.map((img) => this.imgSrc(img));
   }
 
+  // openLightbox(index: number, event: MouseEvent) {
+  //   const target = event.currentTarget as HTMLElement;
+  //   const img = target.querySelector('img');
+
+  //   if (img) {
+  //     const rect = img.getBoundingClientRect();
+  //     this.lightboxStartRect = rect;
+  //   }
+
+  //   this.lightboxIndex = index;
+  //   this.lightboxOpen = true;
+  // }
+
   openLightbox(index: number, event: MouseEvent) {
     const target = event.currentTarget as HTMLElement;
     const img = target.querySelector('img');
+    const rect = img?.getBoundingClientRect() ?? null;
 
-    if (img) {
-      const rect = img.getBoundingClientRect();
-      this.lightboxStartRect = rect;
-    }
-
-    this.lightboxIndex = index;
-    this.lightboxOpen = true;
+    this.lightbox.show(this.lightboxImages, index, rect);
   }
 
   closeLightbox() {

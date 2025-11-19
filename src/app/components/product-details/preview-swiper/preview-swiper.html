@@ -25,12 +25,3 @@
   <div class="swiper-button-next" (click)="nextN(3)"></div>
   }
 </div>
-
-@if (lightboxOpen) {
-<app-lightbox
-  [images]="lightboxImages"
-  [startIndex]="lightboxIndex"
-  [startRect]="lightboxStartRect"
-  (closed)="closeLightbox()"
-/>
-}

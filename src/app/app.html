@@ -26,3 +26,12 @@
     <router-outlet />
   </mat-sidenav-content>
 </mat-sidenav-container>
+
+@if (lightbox.open()) {
+  <app-lightbox
+    [images]="lightbox.images()"
+    [startIndex]="lightbox.startIndex()"
+    [startRect]="lightbox.startRect() ?? undefined"
+    (closed)="lightbox.close()"
+  />
+}
