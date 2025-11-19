@@ -8,7 +8,7 @@
     @for (thumbnailData of items; track thumbnailData.productId + '_' + $index)
     {
     <a
-      class="swiper-slide"
+      class="swiper-slide no__highlight"
       [attr.aria-label]="thumbnailData.productLogoAltText || 'Produkt öffnen'"
       (click)="$event.stopPropagation(); select.emit(thumbnailData)"
     >
