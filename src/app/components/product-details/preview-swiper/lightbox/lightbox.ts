@@ -3,10 +3,12 @@ import {
   Component,
   EventEmitter,
   HostListener,
+  inject,
   Input,
   Output,
 } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
+import { DeviceService } from '../../../../services/device-service';
 
 const duration = '300ms';
 const easing = 'ease-in-out';
@@ -18,6 +20,8 @@ const easing = 'ease-in-out';
   styleUrl: './lightbox.scss',
 })
 export class Lightbox {
+  private deviceService = inject(DeviceService);
+
   @Input({ required: true }) images: string[] = [];
   @Input() startIndex = 0;
   @Input() startRect?: DOMRect;
@@ -30,6 +34,10 @@ export class Lightbox {
   zoomStyles: Record<string, string> = {};
   finalStyles: Record<string, string> = {};
   animateToFinal = false;
+
+  get isMobileDevice() {
+    return this.deviceService.isAndroid || this.deviceService.isiPhone;
+  }
 
   ngOnInit() {
     this.currentIndex =
