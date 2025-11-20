@@ -7,6 +7,7 @@
     [routerLinkActiveOptions]="{ exact: item.route === '/' }"
     #rla="routerLinkActive"
     [activated]="rla.isActive"
+    (click)="collapsed.set(true)"
   >
     <mat-icon
       [fontSet]="rla.isActive ? 'material-icons' : 'material-icons-outlined'"

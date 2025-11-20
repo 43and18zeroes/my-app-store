@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, Input, signal } from '@angular/core';
+import { Component, computed, model, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { RouterModule } from '@angular/router';
@@ -19,11 +19,9 @@ export type MenuItem = {
 export class CustomSidenav {
   sideNavCollapsed = signal(false);
 
-  @Input() set collapsed(val: boolean) {
-    this.sideNavCollapsed.set(val);
-  }
+  collapsed = model.required<boolean>();
 
-  iconMargin = computed(() => (this.sideNavCollapsed() ? '12px' : '16px'));
+  iconMargin = computed(() => (this.collapsed() ? '12px' : '16px'));
 
   menuItems = signal<MenuItem[]>([
     {
