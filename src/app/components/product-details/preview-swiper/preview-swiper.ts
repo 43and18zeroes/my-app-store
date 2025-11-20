@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   Component,
   ElementRef,
   EventEmitter,
@@ -28,6 +29,7 @@ export class PreviewSwiper {
   private deviceService = inject(DeviceService);
   private http = inject(HttpClient);
   private lightbox = inject(LightboxService);
+  private cdr = inject(ChangeDetectorRef);
 
   @Input() productPreviewsPath!: string;
   @Output() select = new EventEmitter<string>();
@@ -67,16 +69,22 @@ export class PreviewSwiper {
     const url = `${this.base}/${p}/gallery.json`;
 
     this.http.get<string[]>(url).subscribe({
-      next: (data) => (this.images = data ?? []),
+      next: (data) => {
+        this.images = data ?? [];
+
+        // 3. Manually trigger change detection to ensure images are in the DOM
+        this.cdr.detectChanges();
+
+        // 4. Initialize Swiper AFTER the DOM has updated
+        requestAnimationFrame(() => {
+          this.initSwiper();
+        });
+      },
       error: (err) => {
         console.error('gallery.json nicht gefunden:', url, err);
         this.images = [];
       },
     });
-  }
-
-  ngAfterViewInit(): void {
-    this.initSwiper();
   }
 
   imgSrc(file: string) {
@@ -85,6 +93,8 @@ export class PreviewSwiper {
   }
 
   private initSwiper() {
+    if (this.swiper) this.destroySwiper();
+
     const host = this.swiperContainer?.nativeElement;
     if (!host) return;
 
@@ -98,8 +108,7 @@ export class PreviewSwiper {
       prevEl = host.querySelector<HTMLElement>('.swiper-button-prev');
     }
 
-    const navigationCfg =
-      nextEl && prevEl ? ({ nextEl, prevEl } as NavigationOptions) : undefined;
+    const navigationCfg = nextEl && prevEl ? { nextEl, prevEl } : false;
 
     const freeModeCfg: NonNullable<SwiperOptions['freeMode']> | false = {
       enabled: true,
