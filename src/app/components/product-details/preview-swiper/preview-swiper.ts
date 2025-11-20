@@ -17,7 +17,6 @@ import { NavigationOptions, SwiperOptions } from 'swiper/types';
 import { PortalModule } from '@angular/cdk/portal';
 import { TemplateRef } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
-import { LightboxService } from './lightbox/lightbox-service';
 
 @Component({
   selector: 'app-preview-swiper',
@@ -28,7 +27,6 @@ import { LightboxService } from './lightbox/lightbox-service';
 export class PreviewSwiper {
   private deviceService = inject(DeviceService);
   private http = inject(HttpClient);
-  private lightbox = inject(LightboxService);
   private cdr = inject(ChangeDetectorRef);
 
   @Input() productPreviewsPath!: string;
@@ -37,7 +35,6 @@ export class PreviewSwiper {
   @ViewChild('swiperContainer') swiperContainer!: ElementRef<HTMLElement>;
   @ViewChild('lbViewport') lbViewport?: ElementRef<HTMLElement>;
   @ViewChild('lbTrack') lbTrack?: ElementRef<HTMLElement>;
-  @ViewChild('lightboxTpl') lightboxTpl!: TemplateRef<unknown>;
 
   constructor() {}
 
@@ -153,39 +150,5 @@ export class PreviewSwiper {
       this.swiper.destroy(true, true);
       this.swiper = undefined;
     }
-  }
-
-  // Lightbox
-  lightboxOpen = false;
-  lightboxIndex = 0;
-  lightboxStartRect?: DOMRect;
-
-  get lightboxImages(): string[] {
-    return this.images.map((img) => this.imgSrc(img));
-  }
-
-  // openLightbox(index: number, event: MouseEvent) {
-  //   const target = event.currentTarget as HTMLElement;
-  //   const img = target.querySelector('img');
-
-  //   if (img) {
-  //     const rect = img.getBoundingClientRect();
-  //     this.lightboxStartRect = rect;
-  //   }
-
-  //   this.lightboxIndex = index;
-  //   this.lightboxOpen = true;
-  // }
-
-  openLightbox(index: number, event: MouseEvent) {
-    const target = event.currentTarget as HTMLElement;
-    const img = target.querySelector('img');
-    const rect = img?.getBoundingClientRect() ?? null;
-
-    this.lightbox.show(this.lightboxImages, index, rect);
-  }
-
-  closeLightbox() {
-    this.lightboxOpen = false;
   }
 }

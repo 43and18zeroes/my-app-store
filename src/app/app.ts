@@ -10,8 +10,6 @@ import { RouterOutlet } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { DeviceService } from './services/device-service';
 import { Subscription } from 'rxjs';
-import { LightboxService } from './components/product-details/preview-swiper/lightbox/lightbox-service';
-import { Lightbox } from "./components/product-details/preview-swiper/lightbox/lightbox";
 
 @Component({
   selector: 'app-root',
@@ -23,8 +21,7 @@ import { Lightbox } from "./components/product-details/preview-swiper/lightbox/l
     MatSidenavModule,
     MatButtonModule,
     MatSlideToggleModule,
-    CustomSidenav,
-    Lightbox
+    CustomSidenav
 ],
   templateUrl: './app.html',
   styleUrl: './app.scss',
@@ -33,7 +30,6 @@ export class App {
   protected readonly title = signal('Angular Material Darkmode');
   deviceService = inject(DeviceService);
   themeService = inject(ThemeService);
-  lightbox = inject(LightboxService);
   collapsed = signal(true);
   isDesktop = signal(true);
   private breakpointSub?: Subscription;
