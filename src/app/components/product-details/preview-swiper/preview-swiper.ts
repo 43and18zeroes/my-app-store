@@ -13,9 +13,8 @@ import { HttpClient } from '@angular/common/http';
 import Swiper from 'swiper';
 import { Navigation, FreeMode } from 'swiper/modules';
 import 'swiper/swiper-bundle.css';
-import { NavigationOptions, SwiperOptions } from 'swiper/types';
+import { SwiperOptions } from 'swiper/types';
 import { PortalModule } from '@angular/cdk/portal';
-import { TemplateRef } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
