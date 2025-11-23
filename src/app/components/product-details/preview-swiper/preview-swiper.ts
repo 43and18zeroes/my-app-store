@@ -22,7 +22,7 @@ import { LightboxDialog } from './lightbox-dialog/lightbox-dialog';
 
 @Component({
   selector: 'app-preview-swiper',
-  imports: [PortalModule, MatIconModule, LightboxDialog],
+  imports: [PortalModule, MatIconModule],
   templateUrl: './preview-swiper.html',
   styleUrl: './preview-swiper.scss',
 })
