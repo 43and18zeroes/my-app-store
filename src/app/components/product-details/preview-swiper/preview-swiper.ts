@@ -16,10 +16,13 @@ import 'swiper/swiper-bundle.css';
 import { SwiperOptions } from 'swiper/types';
 import { PortalModule } from '@angular/cdk/portal';
 import { MatIconModule } from '@angular/material/icon';
+import { MatDialog } from '@angular/material/dialog'; // Füge dies zu den Imports hinzu
+import { Zoom } from 'swiper/modules'; // Füge Zoom zu den Modulen hinzu, falls du es für den Preview brauchst
+import { LightboxDialog } from './lightbox-dialog/lightbox-dialog';
 
 @Component({
   selector: 'app-preview-swiper',
-  imports: [PortalModule, MatIconModule],
+  imports: [PortalModule, MatIconModule, LightboxDialog],
   templateUrl: './preview-swiper.html',
   styleUrl: './preview-swiper.scss',
 })
@@ -149,5 +152,24 @@ export class PreviewSwiper {
       this.swiper.destroy(true, true);
       this.swiper = undefined;
     }
+  }
+
+  // Lightbox
+  private dialog = inject(MatDialog);
+
+  openLightbox(index: number) {
+    this.dialog.open(LightboxDialog, {
+      // Wichtig: Entferne den Standard-Padding und Hintergrund, um den Vollbild-Effekt zu erzielen
+      panelClass: 'full-screen-lightbox',
+      maxWidth: '100vw',
+      maxHeight: '100vh',
+      height: '100%',
+      width: '100%',
+      data: {
+        images: this.images,
+        initialIndex: index,
+        imgBaseUrl: (file: string) => this.imgSrc(file),
+      },
+    });
   }
 }

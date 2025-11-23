@@ -108,3 +108,15 @@ h2 {
     transform: translateY(-1px);
   }
 }
+
+.full-screen-lightbox {
+  // Entfernt den Standard-Hintergrund des Dialogs
+  background: transparent !important;
+  // Setzt den Hintergrund der Lightbox auf Schwarz
+  .mat-mdc-dialog-surface {
+    background: #000;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important; // Wichtig: Entfernt Dialog-Padding
+  }
+}
