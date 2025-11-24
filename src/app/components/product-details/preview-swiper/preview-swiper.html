@@ -1,4 +1,4 @@
-<!-- preview-swiper -->
+<!-- preview-swiper.html -->
 <div
   class="swiper"
   #swiperContainer
@@ -6,22 +6,22 @@
 >
   <div class="swiper-wrapper">
     @for (image of images; track image; let i = $index) {
-    <a
-      class="swiper-slide no__highlight"
-      [attr.aria-label]="image || 'Preview'"
-      (click)="openLightbox(i)"
-    >
-      <img
-        class="logo__shadow"
-        [src]="imgSrc(image)"
-        [alt]="image || 'Preview'"
-      />
-    </a>
+      <a
+        class="swiper-slide no__highlight"
+        [attr.aria-label]="image || 'Preview'"
+        (click)="openLightbox(i, $event)"
+      >
+        <img
+          class="logo__shadow preview-img"
+          [src]="imgSrc(image)"
+          [alt]="image || 'Preview'"
+        />
+      </a>
     }
   </div>
 
   @if (!isMobileDevice) {
-  <div class="swiper-button-prev" (click)="prevN(3)"></div>
-  <div class="swiper-button-next" (click)="nextN(3)"></div>
+    <div class="swiper-button-prev" (click)="prevN(3)"></div>
+    <div class="swiper-button-next" (click)="nextN(3)"></div>
   }
 </div>

@@ -4,14 +4,24 @@
     <mat-icon>close</mat-icon>
   </button>
 
+  <!-- clone layer -->
+  <div class="anim-layer" #animLayer></div>
+
   <div class="swiper full-screen-swiper" #lightboxSwiper>
     <div class="swiper-wrapper">
       @for (image of data.images; track image; let i = $index) {
-      <div class="swiper-slide">
-        <div class="swiper-zoom-container">
-          <img [src]="data.imgBaseUrl(image)" [alt]="image" />
+        <div class="swiper-slide">
+          <div class="swiper-zoom-container">
+            <img
+              #lbImg
+              class="lb-img"
+              [class.lb-img--hidden]="animating && i === data.initialIndex"
+              [src]="data.imgBaseUrl(image)"
+              [alt]="image"
+              (load)="onInitialImageLoad(i, lbImg)"
+            />
+          </div>
         </div>
-      </div>
       }
     </div>
 

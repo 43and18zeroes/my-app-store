@@ -157,9 +157,14 @@ export class PreviewSwiper {
   // Lightbox
   private dialog = inject(MatDialog);
 
-  openLightbox(index: number) {
+  openLightbox(index: number, ev: Event) {
+    // find the img inside the clicked slide
+    const target = ev.currentTarget as HTMLElement | null;
+    const imgEl = target?.querySelector('img') as HTMLImageElement | null;
+
+    const originRect = imgEl?.getBoundingClientRect();
+
     this.dialog.open(LightboxDialog, {
-      // Wichtig: Entferne den Standard-Padding und Hintergrund, um den Vollbild-Effekt zu erzielen
       panelClass: 'full-screen-lightbox',
       maxWidth: '100vw',
       maxHeight: '100vh',
@@ -169,6 +174,7 @@ export class PreviewSwiper {
         images: this.images,
         initialIndex: index,
         imgBaseUrl: (file: string) => this.imgSrc(file),
+        originRect, // 👈 pass rect to dialog
       },
     });
   }
