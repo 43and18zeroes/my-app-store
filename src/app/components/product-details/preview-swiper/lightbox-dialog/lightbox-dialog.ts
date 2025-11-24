@@ -1,10 +1,10 @@
 import {
+  ChangeDetectorRef,
   Component,
   ElementRef,
   Inject,
-  QueryList,
+  NgZone,
   ViewChild,
-  ViewChildren,
 } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -29,14 +29,15 @@ export interface LightboxData {
 export class LightboxDialog {
   @ViewChild('lightboxSwiper') swiperContainer!: ElementRef<HTMLElement>;
   @ViewChild('animLayer') animLayer!: ElementRef<HTMLElement>;
-  @ViewChildren('lbImg') lbImgs!: QueryList<ElementRef<HTMLImageElement>>;
 
   animating = false;
   private swiper?: Swiper;
 
   constructor(
     public dialogRef: MatDialogRef<LightboxDialog>,
-    @Inject(MAT_DIALOG_DATA) public data: LightboxData
+    @Inject(MAT_DIALOG_DATA) public data: LightboxData,
+    private zone: NgZone,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngAfterViewInit(): void {
@@ -50,24 +51,21 @@ export class LightboxDialog {
   onInitialImageLoad(i: number, imgEl: HTMLImageElement) {
     if (i !== this.data.initialIndex) return;
     if (!this.data.originRect) return;
-
-    // Prevent double-run
     if (this.animating) return;
 
-    this.playOpenAnimation(imgEl, this.data.originRect);
+    requestAnimationFrame(() => {
+      this.playOpenAnimation(imgEl, this.data.originRect!);
+    });
   }
 
-    private playOpenAnimation(targetImg: HTMLImageElement, originRect: DOMRect) {
-    this.animating = true;
-
+  private playOpenAnimation(targetImg: HTMLImageElement, originRect: DOMRect) {
     const layer = this.animLayer.nativeElement;
 
-    // Create clone
+    // Clone zuerst erstellen …
     const clone = targetImg.cloneNode(true) as HTMLImageElement;
     clone.classList.add('anim-clone');
     layer.appendChild(clone);
 
-    // Position clone at origin
     Object.assign(clone.style, {
       position: 'fixed',
       top: `${originRect.top}px`,
@@ -78,10 +76,13 @@ export class LightboxDialog {
       borderRadius: '8px',
     });
 
-    // Measure final rect
+    // … dann erst das echte Bild ausblenden
+    this.animating = true;
+    this.cdr.detectChanges();
+
+    // Final rect nach Layout
     const finalRect = targetImg.getBoundingClientRect();
 
-    // Animate via Web Animations API (smooth & easy)
     const anim = clone.animate(
       [
         {
@@ -90,6 +91,7 @@ export class LightboxDialog {
           width: `${originRect.width}px`,
           height: `${originRect.height}px`,
           borderRadius: '8px',
+          opacity: 1,
         },
         {
           top: `${finalRect.top}px`,
@@ -97,6 +99,7 @@ export class LightboxDialog {
           width: `${finalRect.width}px`,
           height: `${finalRect.height}px`,
           borderRadius: '0px',
+          opacity: 1,
         },
       ],
       {
@@ -107,17 +110,24 @@ export class LightboxDialog {
     );
 
     anim.onfinish = () => {
-      // reveal real image, remove clone
-      this.animating = false;
-      clone.remove();
+      // WICHTIG: zurück in Angular-Zone
+      this.zone.run(() => {
+        this.animating = false; // -> echtes Bild wird sichtbar
+        clone.remove();
+        this.cdr.detectChanges();
+      });
     };
   }
 
   private initLightboxSwiper() {
     const host = this.swiperContainer.nativeElement;
 
-    const nextEl = host.querySelector('.swiper-button-next') as HTMLElement | null;
-    const prevEl = host.querySelector('.swiper-button-prev') as HTMLElement | null;
+    const nextEl = host.querySelector(
+      '.swiper-button-next'
+    ) as HTMLElement | null;
+    const prevEl = host.querySelector(
+      '.swiper-button-prev'
+    ) as HTMLElement | null;
 
     const config: SwiperOptions = {
       modules: [Navigation, Zoom],

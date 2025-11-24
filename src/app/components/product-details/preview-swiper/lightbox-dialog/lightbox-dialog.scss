@@ -19,13 +19,13 @@
   .anim-layer {
     position: fixed;
     inset: 0;
-    z-index: 200; // above swiper while animating
+    z-index: 200;
     pointer-events: none;
   }
 
   .anim-clone {
-    object-fit: cover; // same as thumb
-    box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+    object-fit: cover;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
     will-change: top, left, width, height;
   }
 
@@ -52,11 +52,11 @@
         max-height: 100%;
         object-fit: contain;
         cursor: grab;
-        transition: opacity 120ms ease;
+        transition: opacity 120ms ease; // 👈 kürzer
       }
 
       img.lb-img--hidden {
-        opacity: 0; // hides only initial real img while clone animates
+        opacity: 0;
       }
     }
   }
