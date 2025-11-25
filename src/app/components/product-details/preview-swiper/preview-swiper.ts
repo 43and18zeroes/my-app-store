@@ -170,6 +170,8 @@ export class PreviewSwiper {
       maxHeight: '100vh',
       height: '100%',
       width: '100%',
+      enterAnimationDuration: '0ms',
+      exitAnimationDuration: '0ms',
       data: {
         images: this.images,
         initialIndex: index,

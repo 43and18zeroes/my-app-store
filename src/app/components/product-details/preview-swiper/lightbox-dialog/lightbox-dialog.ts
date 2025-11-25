@@ -53,8 +53,12 @@ export class LightboxDialog {
     if (!this.data.originRect) return;
     if (this.animating) return;
 
+    // 1 Frame für Layout + evtl. Swiper
     requestAnimationFrame(() => {
-      this.playOpenAnimation(imgEl, this.data.originRect!);
+      // optional noch ein kleines Timeout, falls nötig:
+      setTimeout(() => {
+        this.playOpenAnimation(imgEl, this.data.originRect!);
+      }, 0);
     });
   }
 
