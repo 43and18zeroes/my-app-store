@@ -52,7 +52,8 @@
         max-height: 100%;
         object-fit: contain;
         cursor: grab;
-        transition: opacity 120ms ease; // 👈 kürzer
+        // transition: opacity 120ms ease;
+        transition: none;
       }
 
       img.lb-img--hidden {
