@@ -142,38 +142,4 @@ export class LightboxDialog {
 
     this.swiper = new Swiper(host, config);
   }
-
-  // private initLightboxSwiper() {
-  //   const host = this.swiperContainer.nativeElement;
-
-  //   const nextEl = host.querySelector(
-  //     '.swiper-button-next'
-  //   ) as HTMLElement | null;
-  //   const prevEl = host.querySelector(
-  //     '.swiper-button-prev'
-  //   ) as HTMLElement | null;
-
-  //   const config: SwiperOptions = {
-  //     modules: [Navigation, Zoom], // Wichtig: Zoom importieren
-  //     loop: false,
-  //     speed: 300,
-  //     slidesPerView: 1,
-  //     // Konfiguriere Navigation
-  //     navigation: {
-  //       nextEl: nextEl, // nextEl ist jetzt vom Typ HTMLElement | null
-  //       prevEl: prevEl, // prevEl ist jetzt vom Typ HTMLElement | null
-  //     },
-  //     // Starte beim angeklickten Bild
-  //     initialSlide: this.data.initialIndex,
-  //     // Aktiviere Zoom für Pinch-Gesten
-  //     zoom: {
-  //       maxRatio: 3,
-  //       minRatio: 1,
-  //     },
-  //     // Mache das Swipen flüssiger (für mobiles Feeling)
-  //     resistanceRatio: 0.8,
-  //   };
-
-  //   new Swiper(host, config);
-  // }
 }
