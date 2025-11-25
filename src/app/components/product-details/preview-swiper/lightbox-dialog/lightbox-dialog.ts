@@ -30,7 +30,11 @@ export class LightboxDialog {
   @ViewChild('lightboxSwiper') swiperContainer!: ElementRef<HTMLElement>;
   @ViewChild('animLayer') animLayer!: ElementRef<HTMLElement>;
 
-  animating = false;
+  // animating = false;
+  hideInitialImage = true;
+  // Flag, um mehrfaches Starten zu verhindern
+  private openingAnimationRunning = false;
+
   private swiper?: Swiper;
 
   constructor(
@@ -42,6 +46,12 @@ export class LightboxDialog {
 
   ngAfterViewInit(): void {
     this.initLightboxSwiper();
+
+    // Fallback: wenn kein originRect, dann kein Fancy-Anim → Bild direkt anzeigen
+    if (!this.data.originRect) {
+      this.hideInitialImage = false;
+      this.cdr.detectChanges();
+    }
   }
 
   close(): void {
@@ -51,11 +61,10 @@ export class LightboxDialog {
   onInitialImageLoad(i: number, imgEl: HTMLImageElement) {
     if (i !== this.data.initialIndex) return;
     if (!this.data.originRect) return;
-    if (this.animating) return;
+    if (this.openingAnimationRunning) return;
 
-    // 1 Frame für Layout + evtl. Swiper
+    // 1 Frame fürs Layout von Swiper + Dialog
     requestAnimationFrame(() => {
-      // optional noch ein kleines Timeout, falls nötig:
       setTimeout(() => {
         this.playOpenAnimation(imgEl, this.data.originRect!);
       }, 0);
@@ -63,13 +72,16 @@ export class LightboxDialog {
   }
 
   private playOpenAnimation(targetImg: HTMLImageElement, originRect: DOMRect) {
+    this.openingAnimationRunning = true;
+
     const layer = this.animLayer.nativeElement;
 
-    // Clone zuerst erstellen …
+    // Clone erstellen
     const clone = targetImg.cloneNode(true) as HTMLImageElement;
     clone.classList.add('anim-clone');
     layer.appendChild(clone);
 
+    // Ausgangsposition = Thumbnail-Rect
     Object.assign(clone.style, {
       position: 'fixed',
       top: `${originRect.top}px`,
@@ -80,11 +92,7 @@ export class LightboxDialog {
       borderRadius: '8px',
     });
 
-    // … dann erst das echte Bild ausblenden
-    this.animating = true;
-    this.cdr.detectChanges();
-
-    // Final rect nach Layout
+    // Zielposition = echtes Lightbox-Bild
     const finalRect = targetImg.getBoundingClientRect();
 
     const anim = clone.animate(
@@ -114,10 +122,11 @@ export class LightboxDialog {
     );
 
     anim.onfinish = () => {
-      // WICHTIG: zurück in Angular-Zone
       this.zone.run(() => {
-        this.animating = false; // -> echtes Bild wird sichtbar
+        // Clone weg, echtes Bild jetzt anzeigen
         clone.remove();
+        this.hideInitialImage = false;
+        this.openingAnimationRunning = false;
         this.cdr.detectChanges();
       });
     };

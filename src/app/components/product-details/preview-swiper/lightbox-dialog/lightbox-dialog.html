@@ -4,7 +4,6 @@
     <mat-icon>close</mat-icon>
   </button>
 
-  <!-- clone layer -->
   <div class="anim-layer" #animLayer></div>
 
   <div class="swiper full-screen-swiper" #lightboxSwiper>
@@ -15,7 +14,7 @@
             <img
               #lbImg
               class="lb-img"
-              [class.lb-img--hidden]="animating && i === data.initialIndex"
+              [class.lb-img--hidden]="hideInitialImage && i === data.initialIndex"
               [src]="data.imgBaseUrl(image)"
               [alt]="image"
               (load)="onInitialImageLoad(i, lbImg)"
