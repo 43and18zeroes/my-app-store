@@ -32,6 +32,15 @@
           height: 148px;
         }
       }
+
+      .preview-img {
+        transition: opacity 150ms ease;
+      }
+
+      .preview-img--hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
     }
   }
 

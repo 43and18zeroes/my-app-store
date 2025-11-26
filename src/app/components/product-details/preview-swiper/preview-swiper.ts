@@ -54,6 +54,7 @@ export class PreviewSwiper {
   };
 
   private swiper?: Swiper;
+  openingIndex: number | null = null;
 
   get isMobileDevice() {
     return this.deviceService.isAndroid || this.deviceService.isiPhone;
@@ -158,13 +159,22 @@ export class PreviewSwiper {
   private dialog = inject(MatDialog);
 
   openLightbox(index: number, ev: Event) {
-    // find the img inside the clicked slide
+    this.openingIndex = index;
+
+    const host = this.swiperContainer.nativeElement;
+
+    const previewImgs = host.querySelectorAll(
+      'img.preview-img'
+    ) as NodeListOf<HTMLImageElement>;
+    const thumbRects = Array.from(previewImgs).map((img) =>
+      img.getBoundingClientRect()
+    );
+
     const target = ev.currentTarget as HTMLElement | null;
     const imgEl = target?.querySelector('img') as HTMLImageElement | null;
+    const originRect = imgEl?.getBoundingClientRect() ?? thumbRects[index];
 
-    const originRect = imgEl?.getBoundingClientRect();
-
-    this.dialog.open(LightboxDialog, {
+    const ref = this.dialog.open(LightboxDialog, {
       panelClass: 'full-screen-lightbox',
       maxWidth: '100vw',
       maxHeight: '100vh',
@@ -176,8 +186,20 @@ export class PreviewSwiper {
         images: this.images,
         initialIndex: index,
         imgBaseUrl: (file: string) => this.imgSrc(file),
-        originRect, // 👈 pass rect to dialog
+        originRect,
+        thumbRects,
+        // 👇 wichtig: Callback für Lightbox
+        onIndexChange: (idx: number) => {
+          this.openingIndex = idx;
+          this.cdr.markForCheck();
+        },
       },
+    });
+
+    ref.afterClosed().subscribe(() => {
+      // nach der Close-Animation Vorschaubild wieder einblenden
+      this.openingIndex = null;
+      this.cdr.markForCheck();
     });
   }
 }

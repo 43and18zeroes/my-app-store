@@ -16,7 +16,9 @@ export interface LightboxData {
   images: string[];
   initialIndex: number;
   imgBaseUrl: (file: string) => string;
-  originRect?: DOMRect; // 👈 new
+  originRect?: DOMRect;
+  thumbRects?: DOMRect[];
+  onIndexChange?: (index: number) => void;
 }
 
 @Component({
@@ -51,12 +53,10 @@ export class LightboxDialog {
   ngAfterViewInit(): void {
     this.initLightboxSwiper();
 
-    // Fallback: wenn kein originRect, dann kein Fancy-Anim → Bild direkt anzeigen
-    if (!this.data.originRect) {
-      this.backgroundVisible = false;
+    // Wenn keine Hero-Animation möglich → Bild direkt anzeigen
+    if (!this.data.originRect && !this.data.thumbRects) {
+      this.hideInitialImage = false;
       this.cdr.detectChanges();
-      setTimeout(() => this.dialogRef.close(), 300);
-      return;
     }
 
     requestAnimationFrame(() => {
@@ -68,19 +68,22 @@ export class LightboxDialog {
   close(): void {
     if (this.closingAnimationRunning) return;
 
-    // Wenn keine Origin-Rect → nur Hintergrund ausblenden & Dialog schließen
-    if (!this.data.originRect) {
+    const thumbRects = this.data.thumbRects;
+
+    // Kein Thumbnail-Rect? → nur Fade-Out + Close
+    if (!thumbRects || !thumbRects[this.currentIndex]) {
       this.backgroundVisible = false;
       this.cdr.detectChanges();
       setTimeout(() => this.dialogRef.close(), 300);
       return;
     }
 
+    const targetRect = thumbRects[this.currentIndex];
+
     // Hintergrund zeitgleich ausfaden
     this.backgroundVisible = false;
     this.cdr.detectChanges();
 
-    // aktuelles Bild im Swiper finden
     const host = this.swiperContainer.nativeElement;
     const activeSlide = host.querySelector(
       '.swiper-slide.swiper-slide-active'
@@ -93,17 +96,27 @@ export class LightboxDialog {
       setTimeout(() => this.dialogRef.close(), 300);
       return;
     }
-    this.playCloseAnimation(imgEl, this.data.originRect);
+
+    this.playCloseAnimation(imgEl, targetRect);
   }
 
   onInitialImageLoad(i: number, imgEl: HTMLImageElement) {
     if (i !== this.data.initialIndex) return;
-    if (!this.data.originRect) return;
     if (this.openingAnimationRunning) return;
+
+    // Origin bevorzugt aus thumbRects, sonst originRect
+    const originRect = this.data.thumbRects?.[i] ?? this.data.originRect;
+
+    if (!originRect) {
+      // kein Rect → keine Hero-Animation, Bild einfach anzeigen
+      this.hideInitialImage = false;
+      this.cdr.detectChanges();
+      return;
+    }
 
     requestAnimationFrame(() => {
       setTimeout(() => {
-        this.playOpenAnimation(imgEl, this.data.originRect!);
+        this.playOpenAnimation(imgEl, originRect);
       }, 0);
     });
   }
@@ -169,12 +182,11 @@ export class LightboxDialog {
     };
   }
 
-  private playCloseAnimation(targetImg: HTMLImageElement, originRect: DOMRect) {
+  private playCloseAnimation(targetImg: HTMLImageElement, targetRect: DOMRect) {
     this.closingAnimationRunning = true;
 
     const layer = this.animLayer.nativeElement;
 
-    // aktives Bild im Swiper verstecken
     this.hideInitialImage = true;
     this.cdr.detectChanges();
 
@@ -184,7 +196,6 @@ export class LightboxDialog {
     clone.classList.add('anim-clone');
     layer.appendChild(clone);
 
-    // Start = aktuelles Vollbild
     Object.assign(clone.style, {
       position: 'fixed',
       top: `${startRect.top}px`,
@@ -195,7 +206,6 @@ export class LightboxDialog {
       borderRadius: '0px',
     });
 
-    // Ziel = Thumbnail-Rect (originRect)
     const anim = clone.animate(
       [
         {
@@ -207,10 +217,10 @@ export class LightboxDialog {
           opacity: 1,
         },
         {
-          top: `${originRect.top}px`,
-          left: `${originRect.left}px`,
-          width: `${originRect.width}px`,
-          height: `${originRect.height}px`,
+          top: `${targetRect.top}px`,
+          left: `${targetRect.left}px`,
+          width: `${targetRect.width}px`,
+          height: `${targetRect.height}px`,
           borderRadius: '8px',
           opacity: 1,
         },
@@ -226,7 +236,7 @@ export class LightboxDialog {
       this.zone.run(() => {
         clone.remove();
         this.closingAnimationRunning = false;
-        this.dialogRef.close();
+        this.dialogRef.close(this.currentIndex);
       });
     };
   }
@@ -252,9 +262,12 @@ export class LightboxDialog {
       resistanceRatio: 0.8,
       on: {
         slideChange: (swiper) => {
-          // aktuellen Index updaten (für evtl. spätere Logik)
           this.zone.run(() => {
             this.currentIndex = swiper.activeIndex;
+
+            // 👇 Preview-Swiper informieren
+            this.data.onIndexChange?.(this.currentIndex);
+
             this.cdr.markForCheck();
           });
         },
