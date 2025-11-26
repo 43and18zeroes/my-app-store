@@ -36,20 +36,27 @@ export class LightboxDialog {
 
   private swiper?: Swiper;
 
+  currentIndex: number;
+  private closingAnimationRunning = false;
+
   constructor(
     public dialogRef: MatDialogRef<LightboxDialog>,
     @Inject(MAT_DIALOG_DATA) public data: LightboxData,
     private zone: NgZone,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) {
+    this.currentIndex = data.initialIndex;
+  }
 
   ngAfterViewInit(): void {
     this.initLightboxSwiper();
 
     // Fallback: wenn kein originRect, dann kein Fancy-Anim → Bild direkt anzeigen
     if (!this.data.originRect) {
-      this.hideInitialImage = false;
+      this.backgroundVisible = false;
       this.cdr.detectChanges();
+      setTimeout(() => this.dialogRef.close(), 300);
+      return;
     }
 
     requestAnimationFrame(() => {
@@ -59,14 +66,35 @@ export class LightboxDialog {
   }
 
   close(): void {
-    // Hintergrund ausfaden
+    if (this.closingAnimationRunning) return;
+
+    // Wenn keine Origin-Rect → nur Hintergrund ausblenden & Dialog schließen
+    if (!this.data.originRect) {
+      this.backgroundVisible = false;
+      this.cdr.detectChanges();
+      setTimeout(() => this.dialogRef.close(), 300);
+      return;
+    }
+
+    // Hintergrund zeitgleich ausfaden
     this.backgroundVisible = false;
     this.cdr.detectChanges();
 
-    // nach der gleichen Dauer wie im CSS schließen
-    setTimeout(() => {
-      this.dialogRef.close();
-    }, 300);
+    // aktuelles Bild im Swiper finden
+    const host = this.swiperContainer.nativeElement;
+    const activeSlide = host.querySelector(
+      '.swiper-slide.swiper-slide-active'
+    ) as HTMLElement | null;
+    const imgEl = activeSlide?.querySelector(
+      'img.lb-img'
+    ) as HTMLImageElement | null;
+
+    if (!imgEl) {
+      // Fallback: ohne Bildanimation schließen
+      setTimeout(() => this.dialogRef.close(), 300);
+      return;
+    }
+    this.playCloseAnimation(imgEl, this.data.originRect);
   }
 
   onInitialImageLoad(i: number, imgEl: HTMLImageElement) {
@@ -143,6 +171,68 @@ export class LightboxDialog {
     };
   }
 
+  private playCloseAnimation(targetImg: HTMLImageElement, originRect: DOMRect) {
+    this.closingAnimationRunning = true;
+
+    const layer = this.animLayer.nativeElement;
+
+    // aktives Bild im Swiper verstecken
+    this.hideInitialImage = true;
+    this.cdr.detectChanges();
+
+    const startRect = targetImg.getBoundingClientRect();
+
+    const clone = targetImg.cloneNode(true) as HTMLImageElement;
+    clone.classList.add('anim-clone');
+    layer.appendChild(clone);
+
+    // Start = aktuelles Vollbild
+    Object.assign(clone.style, {
+      position: 'fixed',
+      top: `${startRect.top}px`,
+      left: `${startRect.left}px`,
+      width: `${startRect.width}px`,
+      height: `${startRect.height}px`,
+      transformOrigin: 'top left',
+      borderRadius: '0px',
+    });
+
+    // Ziel = Thumbnail-Rect (originRect)
+    const anim = clone.animate(
+      [
+        {
+          top: `${startRect.top}px`,
+          left: `${startRect.left}px`,
+          width: `${startRect.width}px`,
+          height: `${startRect.height}px`,
+          borderRadius: '0px',
+          opacity: 1,
+        },
+        {
+          top: `${originRect.top}px`,
+          left: `${originRect.left}px`,
+          width: `${originRect.width}px`,
+          height: `${originRect.height}px`,
+          borderRadius: '8px',
+          opacity: 1,
+        },
+      ],
+      {
+        duration: 300,
+        easing: 'cubic-bezier(0.4, 0.0, 0.2, 1)',
+        fill: 'forwards',
+      }
+    );
+
+    anim.onfinish = () => {
+      this.zone.run(() => {
+        clone.remove();
+        this.closingAnimationRunning = false;
+        this.dialogRef.close();
+      });
+    };
+  }
+
   private initLightboxSwiper() {
     const host = this.swiperContainer.nativeElement;
 
@@ -162,6 +252,15 @@ export class LightboxDialog {
       initialSlide: this.data.initialIndex,
       zoom: { maxRatio: 3, minRatio: 1 },
       resistanceRatio: 0.8,
+      on: {
+        slideChange: (swiper) => {
+          // aktuellen Index updaten (für evtl. spätere Logik)
+          this.zone.run(() => {
+            this.currentIndex = swiper.activeIndex;
+            this.cdr.markForCheck();
+          });
+        },
+      },
     };
 
     this.swiper = new Swiper(host, config);
