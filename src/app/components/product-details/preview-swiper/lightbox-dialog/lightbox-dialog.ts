@@ -30,10 +30,9 @@ export class LightboxDialog {
   @ViewChild('lightboxSwiper') swiperContainer!: ElementRef<HTMLElement>;
   @ViewChild('animLayer') animLayer!: ElementRef<HTMLElement>;
 
-  // animating = false;
   hideInitialImage = true;
-  // Flag, um mehrfaches Starten zu verhindern
   private openingAnimationRunning = false;
+  backgroundVisible = false;
 
   private swiper?: Swiper;
 
@@ -52,10 +51,22 @@ export class LightboxDialog {
       this.hideInitialImage = false;
       this.cdr.detectChanges();
     }
+
+    requestAnimationFrame(() => {
+      this.backgroundVisible = true;
+      this.cdr.detectChanges();
+    });
   }
 
   close(): void {
-    this.dialogRef.close();
+    // Hintergrund ausfaden
+    this.backgroundVisible = false;
+    this.cdr.detectChanges();
+
+    // nach der gleichen Dauer wie im CSS schließen
+    setTimeout(() => {
+      this.dialogRef.close();
+    }, 300);
   }
 
   onInitialImageLoad(i: number, imgEl: HTMLImageElement) {

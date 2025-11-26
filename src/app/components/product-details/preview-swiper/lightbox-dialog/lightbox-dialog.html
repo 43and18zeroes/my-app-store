@@ -1,5 +1,8 @@
 <!-- lightbox-dialog.html -->
-<div class="lightbox-container">
+<div
+  class="lightbox-container"
+  [class.lightbox-container--visible]="backgroundVisible"
+>
   <button mat-icon-button class="close-button" (click)="close()">
     <mat-icon>close</mat-icon>
   </button>
@@ -9,18 +12,18 @@
   <div class="swiper full-screen-swiper" #lightboxSwiper>
     <div class="swiper-wrapper">
       @for (image of data.images; track image; let i = $index) {
-        <div class="swiper-slide">
-          <div class="swiper-zoom-container">
-            <img
-              #lbImg
-              class="lb-img"
-              [class.lb-img--hidden]="hideInitialImage && i === data.initialIndex"
-              [src]="data.imgBaseUrl(image)"
-              [alt]="image"
-              (load)="onInitialImageLoad(i, lbImg)"
-            />
-          </div>
+      <div class="swiper-slide">
+        <div class="swiper-zoom-container">
+          <img
+            #lbImg
+            class="lb-img"
+            [class.lb-img--hidden]="hideInitialImage && i === data.initialIndex"
+            [src]="data.imgBaseUrl(image)"
+            [alt]="image"
+            (load)="onInitialImageLoad(i, lbImg)"
+          />
         </div>
+      </div>
       }
     </div>
 

@@ -114,7 +114,7 @@ h2 {
   background: transparent !important;
   // Setzt den Hintergrund der Lightbox auf Schwarz
   .mat-mdc-dialog-surface {
-    background: #000;
+    background: rgba(0, 0, 0, 0);
     box-shadow: none !important;
     border-radius: 0 !important;
     padding: 0 !important; // Wichtig: Entfernt Dialog-Padding
