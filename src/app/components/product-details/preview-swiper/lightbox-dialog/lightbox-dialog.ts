@@ -90,7 +90,6 @@ export class LightboxDialog {
     ) as HTMLImageElement | null;
 
     if (!imgEl) {
-      // Fallback: ohne Bildanimation schließen
       setTimeout(() => this.dialogRef.close(), 300);
       return;
     }
@@ -102,7 +101,6 @@ export class LightboxDialog {
     if (!this.data.originRect) return;
     if (this.openingAnimationRunning) return;
 
-    // 1 Frame fürs Layout von Swiper + Dialog
     requestAnimationFrame(() => {
       setTimeout(() => {
         this.playOpenAnimation(imgEl, this.data.originRect!);
