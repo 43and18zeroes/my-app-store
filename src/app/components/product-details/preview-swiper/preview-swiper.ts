@@ -98,12 +98,12 @@ export class PreviewSwiper {
     const host = this.swiperContainer?.nativeElement;
     if (!host) return;
 
-    const isMobile = this.isMobileDevice;
+    // const isMobile = this.isMobileDevice;
 
     let nextEl: HTMLElement | null = null;
     let prevEl: HTMLElement | null = null;
 
-    if (!isMobile) {
+    if (!this.isMobileDevice) {
       nextEl = host.querySelector<HTMLElement>('.swiper-button-next');
       prevEl = host.querySelector<HTMLElement>('.swiper-button-prev');
     }
@@ -125,8 +125,8 @@ export class PreviewSwiper {
       freeMode: freeModeCfg,
       slidesPerView: 'auto',
       navigation: navigationCfg,
-      speed: isMobile ? 200 : 500,
-      breakpoints: isMobile ? this.mobileBreakpoints : this.desktopBreakpoints,
+      speed: this.isMobileDevice ? 200 : 500,
+      breakpoints: this.isMobileDevice ? this.mobileBreakpoints : this.desktopBreakpoints,
     };
 
     this.destroySwiper();
