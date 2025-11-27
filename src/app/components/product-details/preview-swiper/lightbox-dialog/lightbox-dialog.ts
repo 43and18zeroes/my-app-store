@@ -19,6 +19,7 @@ export interface LightboxData {
   originRect?: DOMRect;
   thumbRects?: DOMRect[];
   onIndexChange?: (index: number) => void;
+  onCloseComplete?: () => void; // 👈 neu
 }
 
 @Component({
@@ -96,6 +97,10 @@ export class LightboxDialog {
       setTimeout(() => this.dialogRef.close(), 300);
       return;
     }
+
+    // 👇 WICHTIG: Lightbox-Bild direkt zum Start verstecken
+    this.hideInitialImage = true;
+    this.cdr.detectChanges();
 
     this.playCloseAnimation(imgEl, targetRect);
   }
@@ -185,16 +190,11 @@ export class LightboxDialog {
   private playCloseAnimation(targetImg: HTMLImageElement, targetRect: DOMRect) {
     this.closingAnimationRunning = true;
 
-    const layer = this.animLayer.nativeElement;
-
-    this.hideInitialImage = true;
-    this.cdr.detectChanges();
-
     const startRect = targetImg.getBoundingClientRect();
 
     const clone = targetImg.cloneNode(true) as HTMLImageElement;
     clone.classList.add('anim-clone');
-    layer.appendChild(clone);
+    document.body.appendChild(clone); // oder animLayer, wie du es aktuell machst
 
     Object.assign(clone.style, {
       position: 'fixed',
@@ -204,6 +204,7 @@ export class LightboxDialog {
       height: `${startRect.height}px`,
       transformOrigin: 'top left',
       borderRadius: '0px',
+      zIndex: '9999',
     });
 
     const anim = clone.animate(
@@ -236,6 +237,11 @@ export class LightboxDialog {
       this.zone.run(() => {
         clone.remove();
         this.closingAnimationRunning = false;
+
+        // 👇 HIER: Vorschaubild wieder einblenden
+        this.data.onCloseComplete?.();
+
+        // 👇 DANN erst Dialog schließen
         this.dialogRef.close(this.currentIndex);
       });
     };

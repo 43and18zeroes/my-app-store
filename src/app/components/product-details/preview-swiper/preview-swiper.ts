@@ -182,24 +182,28 @@ export class PreviewSwiper {
       width: '100%',
       enterAnimationDuration: '0ms',
       exitAnimationDuration: '0ms',
+      hasBackdrop: false,
       data: {
         images: this.images,
         initialIndex: index,
         imgBaseUrl: (file: string) => this.imgSrc(file),
         originRect,
         thumbRects,
-        // 👇 wichtig: Callback für Lightbox
         onIndexChange: (idx: number) => {
+          // aktuell aktives Bild in der Lightbox → dieses Vorschaubild ausblenden
           this.openingIndex = idx;
+          this.cdr.markForCheck();
+        },
+        onCloseComplete: () => {
+          // 👈 wird direkt NACH der Shrink-Animation aufgerufen
+          this.openingIndex = null;
           this.cdr.markForCheck();
         },
       },
     });
 
     ref.afterClosed().subscribe(() => {
-      // nach der Close-Animation Vorschaubild wieder einblenden
-      this.openingIndex = null;
-      this.cdr.markForCheck();
+      // hier NICHTS mehr bzgl. openingIndex
     });
   }
 }
