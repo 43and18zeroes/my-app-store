@@ -24,9 +24,11 @@ mat-toolbar {
 mat-sidenav-container {
   @include custom-mixins.mat-theme-transition();
   height: calc(100vh - 64px);
+  height: calc(100dvh - 64px);
 
   @media (width < 600px) {
     height: calc(100vh - 56px);
+    height: calc(100dvh - 56px);
   }
 
   mat-sidenav {
@@ -41,13 +43,14 @@ mat-sidenav-container {
   mat-sidenav-content {
     padding: 30px 16px 16px 16px;
     box-sizing: border-box;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
   }
 }
 
-.android__height {
-  height: calc(100vh - 112px);
-}
+// .android__height {
+//   height: calc(100vh - 112px);
+// }
 
-.iphone__height {
-  height: calc(100vh - 164px);
-}
+// .iphone__height {
+//   height: calc(100vh - 164px);
+// }
