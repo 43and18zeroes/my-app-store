@@ -8,8 +8,8 @@ import { CustomSidenav } from './components/custom-sidenav/custom-sidenav';
 import { ThemeService } from './services/theme-service';
 import { RouterOutlet } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { DeviceService } from './services/device-service';
-import { Subscription } from 'rxjs';
+// import { DeviceService } from './services/device-service';
+import { fromEvent, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -21,45 +21,53 @@ import { Subscription } from 'rxjs';
     MatSidenavModule,
     MatButtonModule,
     MatSlideToggleModule,
-    CustomSidenav
-],
+    CustomSidenav,
+  ],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
 export class App {
   protected readonly title = signal('Angular Material Darkmode');
-  deviceService = inject(DeviceService);
+  // deviceService = inject(DeviceService);
   themeService = inject(ThemeService);
   collapsed = signal(true);
   isDesktop = signal(true);
-  private breakpointSub?: Subscription;
+  // private breakpointSub?: Subscription;
+  private resizeSub?: Subscription;
 
   constructor(private breakpointObserver: BreakpointObserver) {
-    effect(() => {
-      const _width = this.deviceService.viewportWidth();
-      this.collapsed.set(true);
-    });
+    // effect(() => {
+    //   console.log('app resize');
+    //   // const _width = this.deviceService.viewportWidth();
+    //   this.collapsed.set(true);
+    // });
   }
 
   ngOnInit() {
     this.themeService.initTheme();
-    this.breakpointSub = this.breakpointObserver
-      .observe([Breakpoints.Handset])
-      .subscribe((result) => {
-        this.isDesktop.set(!result.matches);
-      });
+    // this.breakpointSub = this.breakpointObserver
+    //   .observe([Breakpoints.Handset])
+    //   .subscribe((result) => {
+    //     this.isDesktop.set(!result.matches);
+    //     this.collapsed.set(true);
+    //   });
+    this.resizeSub = fromEvent(window, 'resize').subscribe(() => {
+      this.collapsed.set(true);
+      // optional: nur zum Debuggen
+      // console.log('resize, collapsed -> true');
+    });
   }
 
   sidenavWidth = computed(() => (this.collapsed() ? '81px' : '250px'));
   contentMarginLeft = computed(() => {
-      return '81px';
+    return '81px';
   });
 
   collapseSidenav() {
     this.collapsed.set(true);
   }
 
-  ngOnDestroy() {
-    this.breakpointSub?.unsubscribe();
-  }
+  // ngOnDestroy() {
+  //   this.breakpointSub?.unsubscribe();
+  // }
 }
