@@ -2,7 +2,6 @@
 <div
   class="swiper"
   #swiperContainer
-  [class.swiper--mobile-padding]="isMobileDevice"
 >
   <div class="swiper-wrapper">
     @for (thumbnailData of items; track thumbnailData.productId + '_' + $index)
@@ -24,9 +23,6 @@
     </a>
     }
   </div>
-
-  @if (!isMobileDevice) {
   <div class="swiper-button-prev"></div>
   <div class="swiper-button-next"></div>
-  }
 </div>
