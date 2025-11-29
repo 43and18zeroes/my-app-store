@@ -74,7 +74,8 @@ h2 {
 
 .logo__shadow {
   display: block;
-  transition: box-shadow 180ms ease, transform 180ms ease;
+  transition: box-shadow 180ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 180ms cubic-bezier(0.4, 0, 0.2, 1);
   will-change: box-shadow, transform;
   cursor: pointer;
   box-shadow: 0 3px 5px -1px color-mix(in srgb, light-dark(#000, #fff) 10%, light-dark(#faf9fd, #121316)),
