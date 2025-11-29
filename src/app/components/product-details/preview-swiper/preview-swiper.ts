@@ -93,9 +93,7 @@ export class PreviewSwiper {
       freeMode: freeModeCfg,
       slidesPerView: 'auto',
       navigation: navigationCfg,
-      speed: 500, // Default-Desktop
-
-      // 👉 alles nach Breite gesteuert, kein DeviceService mehr
+      speed: 500,
       breakpoints: {
         0: {
           spaceBetween: 10,
