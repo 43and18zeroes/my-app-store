@@ -11,8 +11,8 @@
   padding: 16px 60px;
   margin: -16px;
 
-  &.swiper--mobile-padding {
-    padding: 16px;
+  @media (width < 1200px) {
+    padding: 16px 16px;
   }
 
   .swiper-wrapper {
@@ -71,6 +71,11 @@
     /* Style */
     background: light-dark(rgba(18, 19, 22, 0), rgba(18, 19, 22, 0.5));
     transition: background var.$mat-duration var.$mat-easing;
+
+    @media (width < 1200px) {
+      display: none;
+      pointer-events: none;
+    }
   }
 
   .swiper-button-prev {

@@ -3,12 +3,11 @@ import {
   Component,
   ElementRef,
   EventEmitter,
-  inject,
   Input,
   Output,
   ViewChild,
+  inject,
 } from '@angular/core';
-import { DeviceService } from '../../../services/device-service';
 import { HttpClient } from '@angular/common/http';
 import Swiper from 'swiper';
 import { Navigation, FreeMode } from 'swiper/modules';
@@ -16,8 +15,7 @@ import 'swiper/swiper-bundle.css';
 import { SwiperOptions } from 'swiper/types';
 import { PortalModule } from '@angular/cdk/portal';
 import { MatIconModule } from '@angular/material/icon';
-import { MatDialog } from '@angular/material/dialog'; // Füge dies zu den Imports hinzu
-import { Zoom } from 'swiper/modules'; // Füge Zoom zu den Modulen hinzu, falls du es für den Preview brauchst
+import { MatDialog } from '@angular/material/dialog';
 import { LightboxDialog } from './lightbox-dialog/lightbox-dialog';
 
 @Component({
@@ -27,9 +25,9 @@ import { LightboxDialog } from './lightbox-dialog/lightbox-dialog';
   styleUrl: './preview-swiper.scss',
 })
 export class PreviewSwiper {
-  private deviceService = inject(DeviceService);
   private http = inject(HttpClient);
   private cdr = inject(ChangeDetectorRef);
+  private dialog = inject(MatDialog);
 
   @Input() productPreviewsPath!: string;
   @Output() select = new EventEmitter<string>();
@@ -38,30 +36,10 @@ export class PreviewSwiper {
   @ViewChild('lbViewport') lbViewport?: ElementRef<HTMLElement>;
   @ViewChild('lbTrack') lbTrack?: ElementRef<HTMLElement>;
 
-  constructor() {}
-
-  desktopBreakpoints: SwiperOptions['breakpoints'] = {
-    320: { spaceBetween: 20 },
-    600: { spaceBetween: 20 },
-    960: { spaceBetween: 20 },
-    1440: { spaceBetween: 20 },
-  };
-
-  mobileBreakpoints: SwiperOptions['breakpoints'] = {
-    320: { spaceBetween: 10 },
-    600: { spaceBetween: 10 },
-    960: { spaceBetween: 10 },
-  };
-
-  private swiper?: Swiper;
+  images: string[] = [];
   openingIndex: number | null = null;
 
-  get isMobileDevice() {
-    return this.deviceService.isAndroid || this.deviceService.isiPhone;
-  }
-
-  images: string[] = [];
-
+  private swiper?: Swiper;
   private readonly base = '/img/applications/previews';
 
   ngOnInit() {
@@ -71,11 +49,8 @@ export class PreviewSwiper {
     this.http.get<string[]>(url).subscribe({
       next: (data) => {
         this.images = data ?? [];
-
-        // 3. Manually trigger change detection to ensure images are in the DOM
         this.cdr.detectChanges();
 
-        // 4. Initialize Swiper AFTER the DOM has updated
         requestAnimationFrame(() => {
           this.initSwiper();
         });
@@ -98,15 +73,8 @@ export class PreviewSwiper {
     const host = this.swiperContainer?.nativeElement;
     if (!host) return;
 
-    // const isMobile = this.isMobileDevice;
-
-    let nextEl: HTMLElement | null = null;
-    let prevEl: HTMLElement | null = null;
-
-    if (!this.isMobileDevice) {
-      nextEl = host.querySelector<HTMLElement>('.swiper-button-next');
-      prevEl = host.querySelector<HTMLElement>('.swiper-button-prev');
-    }
+    const nextEl = host.querySelector<HTMLElement>('.swiper-button-next') ?? undefined;
+    const prevEl = host.querySelector<HTMLElement>('.swiper-button-prev') ?? undefined;
 
     const navigationCfg = nextEl && prevEl ? { nextEl, prevEl } : false;
 
@@ -125,11 +93,27 @@ export class PreviewSwiper {
       freeMode: freeModeCfg,
       slidesPerView: 'auto',
       navigation: navigationCfg,
-      speed: this.isMobileDevice ? 200 : 500,
-      breakpoints: this.isMobileDevice ? this.mobileBreakpoints : this.desktopBreakpoints,
+      speed: 500, // Default-Desktop
+
+      // 👉 alles nach Breite gesteuert, kein DeviceService mehr
+      breakpoints: {
+        0: {
+          spaceBetween: 10,
+          speed: 200,
+          navigation: {
+            enabled: false,
+          },
+        },
+        922: {
+          spaceBetween: 20,
+          speed: 500,
+          navigation: {
+            enabled: true,
+          },
+        },
+      },
     };
 
-    this.destroySwiper();
     this.swiper = new Swiper(host, baseConfig);
   }
 
@@ -156,8 +140,6 @@ export class PreviewSwiper {
   }
 
   // Lightbox
-  private dialog = inject(MatDialog);
-
   openLightbox(index: number, ev: Event) {
     this.openingIndex = index;
 
@@ -190,12 +172,10 @@ export class PreviewSwiper {
         originRect,
         thumbRects,
         onIndexChange: (idx: number) => {
-          // aktuell aktives Bild in der Lightbox → dieses Vorschaubild ausblenden
           this.openingIndex = idx;
           this.cdr.markForCheck();
         },
         onCloseComplete: () => {
-          // 👈 wird direkt NACH der Shrink-Animation aufgerufen
           this.openingIndex = null;
           this.cdr.markForCheck();
         },
@@ -203,7 +183,7 @@ export class PreviewSwiper {
     });
 
     ref.afterClosed().subscribe(() => {
-      // hier NICHTS mehr bzgl. openingIndex
+      // nichts mehr mit openingIndex
     });
   }
 }
