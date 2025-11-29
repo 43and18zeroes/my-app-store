@@ -31,8 +31,7 @@ export class App {
   isDesktop = signal(true);
   private resizeSub?: Subscription;
 
-  constructor() {
-  }
+  constructor() {}
 
   ngOnInit() {
     this.themeService.initTheme();
@@ -48,5 +47,9 @@ export class App {
 
   collapseSidenav() {
     this.collapsed.set(true);
+  }
+
+  ngOnDestroy() {
+    this.resizeSub?.unsubscribe();
   }
 }
