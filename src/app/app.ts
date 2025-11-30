@@ -28,7 +28,6 @@ export class App {
   protected readonly title = signal('Angular Material Darkmode');
   themeService = inject(ThemeService);
   collapsed = signal(true);
-  isDesktop = signal(true);
   viewportWidth = signal(window.innerWidth);
   private resizeSub?: Subscription;
 
@@ -44,12 +43,8 @@ export class App {
   }
 
   sidenavWidth = computed(() => (this.collapsed() ? '81px' : '250px'));
-  // contentMarginLeft = computed(() => {
-  //   return '81px';
-  // });
 
   contentMarginLeft = computed(() => {
-    const width = this.viewportWidth();
     return '81px';
   });
 
