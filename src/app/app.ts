@@ -50,10 +50,7 @@ export class App {
 
   contentMarginLeft = computed(() => {
     const width = this.viewportWidth();
-    if (width < 600) {
-      return '81px';
-    }
-    return this.collapsed() ? '81px' : '250px';
+    return '81px';
   });
 
   collapseSidenav() {
