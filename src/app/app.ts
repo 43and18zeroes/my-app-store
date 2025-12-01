@@ -7,7 +7,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { CustomSidenav } from './components/custom-sidenav/custom-sidenav';
 import { ThemeService } from './services/theme-service';
 import { RouterOutlet } from '@angular/router';
-import { fromEvent, Subscription } from 'rxjs';
+import { debounceTime, fromEvent, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -35,10 +35,12 @@ export class App {
 
   ngOnInit() {
     this.themeService.initTheme();
-    this.resizeSub = fromEvent(window, 'resize').subscribe(() => {
-      this.viewportWidth.set(window.innerWidth);
-      this.collapsed.set(true);
-    });
+    this.resizeSub = fromEvent(window, 'resize')
+      .pipe(debounceTime(100))
+      .subscribe(() => {
+        this.viewportWidth.set(window.innerWidth);
+        this.collapsed.set(true);
+      });
   }
 
   collapseSidenav() {
