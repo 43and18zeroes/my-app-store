@@ -35,18 +35,11 @@ export class App {
 
   ngOnInit() {
     this.themeService.initTheme();
-
     this.resizeSub = fromEvent(window, 'resize').subscribe(() => {
       this.viewportWidth.set(window.innerWidth);
       this.collapsed.set(true);
     });
   }
-
-  sidenavWidth = computed(() => (this.collapsed() ? '81px' : '250px'));
-
-  contentMarginLeft = computed(() => {
-    return '81px';
-  });
 
   collapseSidenav() {
     this.collapsed.set(true);

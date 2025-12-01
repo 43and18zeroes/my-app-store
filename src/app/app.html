@@ -14,15 +14,18 @@
     }}</mat-icon>
   </button>
 </mat-toolbar>
-<mat-sidenav-container>
-  <mat-sidenav opened mode="side" [style.width]="sidenavWidth()">
+
+<mat-sidenav-container [class.is-collapsed]="collapsed()">
+  
+  <mat-sidenav opened mode="side">
     <app-custom-sidenav [(collapsed)]="collapsed"></app-custom-sidenav>
   </mat-sidenav>
+
   <mat-sidenav-content
-    [style.margin-left]="contentMarginLeft()"
     (touchend)="collapseSidenav()"
     (click)="collapseSidenav()"
   >
     <router-outlet />
   </mat-sidenav-content>
+
 </mat-sidenav-container>
