@@ -69,7 +69,7 @@
     cursor: pointer;
 
     /* Style */
-    background: light-dark(rgba(18, 19, 22, 0), rgba(18, 19, 22, 0.5));
+    background: light-dark(rgba(255, 255, 255, 0.5), rgba(18, 19, 22, 0.5));
     transition: background var.$mat-duration var.$mat-easing;
 
     @media (width < 1200px) {
