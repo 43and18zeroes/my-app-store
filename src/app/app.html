@@ -16,7 +16,6 @@
 </mat-toolbar>
 
 <mat-sidenav-container [class.is-collapsed]="collapsed()">
-  
   <mat-sidenav opened mode="side">
     <app-custom-sidenav [(collapsed)]="collapsed"></app-custom-sidenav>
   </mat-sidenav>
@@ -25,7 +24,12 @@
     (touchend)="collapseSidenav()"
     (click)="collapseSidenav()"
   >
+    <div
+      class="sidenav-overlay"
+      [class.active]="!collapsed()"
+      (touchend)="collapseSidenav()"
+      (click)="collapseSidenav()"
+    ></div>
     <router-outlet />
   </mat-sidenav-content>
-
 </mat-sidenav-container>

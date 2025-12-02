@@ -52,5 +52,22 @@ mat-sidenav-container {
     padding: 30px 16px 16px 16px;
     box-sizing: border-box;
     padding-bottom: calc(16px + env(safe-area-inset-bottom));
+
+    .sidenav-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.2);
+      z-index: 2; // Muss über dem Inhalt liegen
+      opacity: 0; // Standardmäßig unsichtbar
+      transition: opacity 0.3s;
+      pointer-events: none; // Standardmäßig Klicks durchlassen
+      &.active {
+        opacity: 1;
+        pointer-events: auto; // Klicks abfangen und Sidebar schließen
+      }
+    }
   }
 }
