@@ -40,6 +40,7 @@
       .preview-img--hidden {
         opacity: 0;
         pointer-events: none;
+        transition: opacity 100ms ease;
       }
     }
   }
