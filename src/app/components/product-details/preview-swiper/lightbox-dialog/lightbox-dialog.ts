@@ -165,7 +165,7 @@ export class LightboxDialog {
           left: `${finalRect.left}px`,
           width: `${finalRect.width}px`,
           height: `${finalRect.height}px`,
-          borderRadius: '0px',
+          borderRadius: '8px',
           opacity: 1,
         },
       ],
@@ -203,7 +203,7 @@ export class LightboxDialog {
       width: `${startRect.width}px`,
       height: `${startRect.height}px`,
       transformOrigin: 'top left',
-      borderRadius: '0px',
+      borderRadius: '8px',
       zIndex: '9999',
     });
 
@@ -214,7 +214,7 @@ export class LightboxDialog {
           left: `${startRect.left}px`,
           width: `${startRect.width}px`,
           height: `${startRect.height}px`,
-          borderRadius: '0px',
+          borderRadius: '8px',
           opacity: 1,
         },
         {
