@@ -11,7 +11,7 @@
 
   // 🔥 eigene Overlay-Ebene per ::before
   &::before {
-    content: '';
+    content: "";
     position: fixed;
     inset: 0;
     background-color: #000;
@@ -19,7 +19,7 @@
     transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1);
     will-change: opacity;
     pointer-events: none;
-    z-index: 0; // unter allem anderen
+    z-index: 0;
   }
 
   &.lightbox-container--visible::before {
@@ -33,12 +33,16 @@
     z-index: 100;
     color: white;
     background: rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+    outline: none;
+    border: none;
+    padding: 12px;
   }
 
   .anim-layer {
     position: fixed;
     inset: 0;
-    z-index: 200; // über Overlay & Swiper
+    z-index: 200;
     pointer-events: none;
   }
 
@@ -72,6 +76,7 @@
         object-fit: contain;
         cursor: grab;
         transition: none;
+        border-radius: 8px;
       }
 
       img.lb-img--hidden {
