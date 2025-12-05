@@ -3,7 +3,7 @@
   class="lightbox-container no__highlight"
   [class.lightbox-container--visible]="backgroundVisible"
 >
-  <button mat-icon-button class="close-button" (click)="close()">
+  <button mat-icon-button class="close-button overlay-btns" [class.overlay-btns-hidden]="hideOverlyBtns" (click)="close()">
     <mat-icon>close</mat-icon>
   </button>
 
@@ -27,7 +27,7 @@
       }
     </div>
 
-    <div class="swiper-button-prev"></div>
-    <div class="swiper-button-next"></div>
+    <div class="swiper-button-prev overlay-btns" [class.overlay-btns-hidden]="hideOverlyBtns"></div>
+    <div class="swiper-button-next overlay-btns" [class.overlay-btns-hidden]="hideOverlyBtns"></div>
   </div>
 </div>

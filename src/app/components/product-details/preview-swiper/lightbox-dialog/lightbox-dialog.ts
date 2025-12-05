@@ -41,6 +41,7 @@ export class LightboxDialog {
 
   currentIndex: number;
   private closingAnimationRunning = false;
+  hideOverlyBtns = true;
 
   constructor(
     public dialogRef: MatDialogRef<LightboxDialog>,
@@ -68,7 +69,7 @@ export class LightboxDialog {
 
   close(): void {
     if (this.closingAnimationRunning) return;
-
+    this.hideOverlyBtns = true;
     const thumbRects = this.data.thumbRects;
 
     // Kein Thumbnail-Rect? → nur Fade-Out + Close
@@ -248,6 +249,7 @@ export class LightboxDialog {
   }
 
   private initLightboxSwiper() {
+    this.hideOverlyBtns = false;
     const host = this.swiperContainer.nativeElement;
 
     const nextEl = host.querySelector(
