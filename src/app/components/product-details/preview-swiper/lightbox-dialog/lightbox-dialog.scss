@@ -49,7 +49,8 @@
   .anim-clone {
     object-fit: cover;
     box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
-    will-change: top, left, width, height;
+    will-change: transform, opacity;
+    backface-visibility: hidden;
   }
 
   .full-screen-swiper {

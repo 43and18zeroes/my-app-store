@@ -132,12 +132,13 @@ export class LightboxDialog {
 
     const layer = this.animLayer.nativeElement;
 
-    // Clone erstellen
     const clone = targetImg.cloneNode(true) as HTMLImageElement;
     clone.classList.add('anim-clone');
     layer.appendChild(clone);
 
-    // Ausgangsposition = Thumbnail-Rect
+    const finalRect = targetImg.getBoundingClientRect();
+
+    // Start: Thumbnail-Rect
     Object.assign(clone.style, {
       position: 'fixed',
       top: `${originRect.top}px`,
@@ -145,41 +146,37 @@ export class LightboxDialog {
       width: `${originRect.width}px`,
       height: `${originRect.height}px`,
       transformOrigin: 'top left',
-      borderRadius: '8px',
+      borderRadius: '2px',
     });
 
-    // Zielposition = echtes Lightbox-Bild
-    const finalRect = targetImg.getBoundingClientRect();
+    // Differenzen zwischen Start- & Ziel-Rect
+    const dx = finalRect.left - originRect.left;
+    const dy = finalRect.top - originRect.top;
+    const scaleX = finalRect.width / originRect.width;
+    const scaleY = finalRect.height / originRect.height;
 
+    // Nur transform animieren
     const anim = clone.animate(
       [
         {
-          top: `${originRect.top}px`,
-          left: `${originRect.left}px`,
-          width: `${originRect.width}px`,
-          height: `${originRect.height}px`,
-          borderRadius: '8px',
+          transform: 'translate3d(0, 0, 0) scale(1, 1)',
           opacity: 1,
         },
         {
-          top: `${finalRect.top}px`,
-          left: `${finalRect.left}px`,
-          width: `${finalRect.width}px`,
-          height: `${finalRect.height}px`,
-          borderRadius: '8px',
+          transform: `translate3d(${dx}px, ${dy}px, 0) scale(${scaleX}, ${scaleY})`,
           opacity: 1,
         },
       ],
       {
-        duration: 300,
+        duration: 280, // leicht kürzer wirkt oft "flüssiger"
         easing: 'cubic-bezier(0.4, 0.0, 0.2, 1)',
         fill: 'forwards',
+        composite: 'replace',
       }
     );
 
     anim.onfinish = () => {
       this.zone.run(() => {
-        // Clone weg, echtes Bild jetzt anzeigen
         clone.remove();
         this.hideInitialImage = false;
         this.openingAnimationRunning = false;
@@ -195,7 +192,7 @@ export class LightboxDialog {
 
     const clone = targetImg.cloneNode(true) as HTMLImageElement;
     clone.classList.add('anim-clone');
-    document.body.appendChild(clone); // oder animLayer, wie du es aktuell machst
+    this.animLayer.nativeElement.appendChild(clone);
 
     Object.assign(clone.style, {
       position: 'fixed',
@@ -208,29 +205,27 @@ export class LightboxDialog {
       zIndex: '9999',
     });
 
+    const dx = targetRect.left - startRect.left;
+    const dy = targetRect.top - startRect.top;
+    const scaleX = targetRect.width / startRect.width;
+    const scaleY = targetRect.height / startRect.height;
+
     const anim = clone.animate(
       [
         {
-          top: `${startRect.top}px`,
-          left: `${startRect.left}px`,
-          width: `${startRect.width}px`,
-          height: `${startRect.height}px`,
-          borderRadius: '8px',
+          transform: 'translate3d(0, 0, 0) scale(1, 1)',
           opacity: 1,
         },
         {
-          top: `${targetRect.top}px`,
-          left: `${targetRect.left}px`,
-          width: `${targetRect.width}px`,
-          height: `${targetRect.height}px`,
-          borderRadius: '8px',
+          transform: `translate3d(${dx}px, ${dy}px, 0) scale(${scaleX}, ${scaleY})`,
           opacity: 1,
         },
       ],
       {
-        duration: 300,
+        duration: 280,
         easing: 'cubic-bezier(0.4, 0.0, 0.2, 1)',
         fill: 'forwards',
+        composite: 'replace',
       }
     );
 
@@ -238,11 +233,7 @@ export class LightboxDialog {
       this.zone.run(() => {
         clone.remove();
         this.closingAnimationRunning = false;
-
-        // 👇 HIER: Vorschaubild wieder einblenden
         this.data.onCloseComplete?.();
-
-        // 👇 DANN erst Dialog schließen
         this.dialogRef.close(this.currentIndex);
       });
     };
