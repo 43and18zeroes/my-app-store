@@ -44,6 +44,11 @@ export class LightboxDialog {
   private closingAnimationRunning = false;
   hideOverlyBtns = true;
 
+  private isMobileDevice(): boolean {
+    // recht robust: "coarse pointer" = Touch
+    return window.matchMedia?.('(pointer: coarse)').matches ?? false;
+  }
+
   constructor(
     public dialogRef: MatDialogRef<LightboxDialog>,
     @Inject(MAT_DIALOG_DATA) public data: LightboxData,
@@ -251,10 +256,12 @@ export class LightboxDialog {
       '.swiper-button-prev'
     ) as HTMLElement | null;
 
+    const isMobile = this.isMobileDevice();
+
     const config: SwiperOptions = {
       modules: [Navigation, Zoom],
       loop: false,
-      speed: 300,
+      speed: isMobile ? 180 : 300,
       slidesPerView: 1,
       navigation: { nextEl, prevEl },
       initialSlide: this.data.initialIndex,
