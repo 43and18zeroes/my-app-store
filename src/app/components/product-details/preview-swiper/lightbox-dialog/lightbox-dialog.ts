@@ -275,4 +275,16 @@ export class LightboxDialog {
 
     this.swiper = new Swiper(host, config);
   }
+
+  onCloseClick(event: MouseEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.close();
+  }
+
+  onCloseTouchEnd(event: TouchEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.close();
+  }
 }

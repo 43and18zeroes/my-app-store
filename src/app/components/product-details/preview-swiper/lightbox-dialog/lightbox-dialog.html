@@ -3,7 +3,13 @@
   class="lightbox-container no__highlight"
   [class.lightbox-container--visible]="backgroundVisible"
 >
-  <button mat-icon-button class="close-button overlay-btns" [class.overlay-btns-hidden]="hideOverlyBtns" (click)="close()">
+  <button
+    mat-icon-button
+    class="close-button overlay-btns"
+    [class.overlay-btns-hidden]="hideOverlyBtns"
+    (click)="onCloseClick($event)"
+    (touchend)="onCloseTouchEnd($event)"
+  >
     <mat-icon>close</mat-icon>
   </button>
 
@@ -12,22 +18,28 @@
   <div class="swiper full-screen-swiper" #lightboxSwiper>
     <div class="swiper-wrapper">
       @for (image of data.images; track image; let i = $index) {
-        <div class="swiper-slide">
-          <div class="swiper-zoom-container">
-            <img
-              #lbImg
-              class="lb-img"
-              [class.lb-img--hidden]="hideInitialImage && i === currentIndex"
-              [src]="data.imgBaseUrl(image)"
-              [alt]="image"
-              (load)="onInitialImageLoad(i, lbImg)"
-            />
-          </div>
+      <div class="swiper-slide">
+        <div class="swiper-zoom-container">
+          <img
+            #lbImg
+            class="lb-img"
+            [class.lb-img--hidden]="hideInitialImage && i === currentIndex"
+            [src]="data.imgBaseUrl(image)"
+            [alt]="image"
+            (load)="onInitialImageLoad(i, lbImg)"
+          />
         </div>
+      </div>
       }
     </div>
 
-    <div class="swiper-button-prev overlay-btns" [class.overlay-btns-hidden]="hideOverlyBtns"></div>
-    <div class="swiper-button-next overlay-btns" [class.overlay-btns-hidden]="hideOverlyBtns"></div>
+    <div
+      class="swiper-button-prev overlay-btns"
+      [class.overlay-btns-hidden]="hideOverlyBtns"
+    ></div>
+    <div
+      class="swiper-button-next overlay-btns"
+      [class.overlay-btns-hidden]="hideOverlyBtns"
+    ></div>
   </div>
 </div>
