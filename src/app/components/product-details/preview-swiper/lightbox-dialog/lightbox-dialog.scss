@@ -99,6 +99,10 @@
   .swiper-button-next {
     color: white;
     transform: scale(1.5);
+
+    @media (width < 1200px) {
+      display: none;
+    }
   }
 
   .overlay-btns {
