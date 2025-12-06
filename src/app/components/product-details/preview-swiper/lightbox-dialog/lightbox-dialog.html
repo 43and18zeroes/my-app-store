@@ -3,15 +3,16 @@
   class="lightbox-container no__highlight"
   [class.lightbox-container--visible]="backgroundVisible"
 >
-  <button
-    mat-icon-button
-    class="close-button overlay-btns"
-    [class.overlay-btns-hidden]="hideOverlyBtns"
+  <div
+    class="close-button-area"
     (click)="onCloseClick($event)"
     (touchend)="onCloseTouchEnd($event)"
+    [class.overlay-btns-hidden]="hideOverlyBtns"
   >
-    <mat-icon>close</mat-icon>
-  </button>
+    <button mat-icon-button class="close-button overlay-btns">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
 
   <div class="anim-layer" #animLayer></div>
 
