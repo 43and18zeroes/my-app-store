@@ -2,6 +2,7 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
+  HostListener,
   Inject,
   NgZone,
   ViewChild,
@@ -286,5 +287,29 @@ export class LightboxDialog {
     event.preventDefault();
     event.stopPropagation();
     this.close();
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  onKeydown(event: KeyboardEvent) {
+    if (!this.swiper) return;
+
+    switch (event.key) {
+      case 'ArrowRight':
+      case 'Right': // ältere Browser
+        event.preventDefault();
+        this.swiper.slideNext();
+        break;
+
+      case 'ArrowLeft':
+      case 'Left':
+        event.preventDefault();
+        this.swiper.slidePrev();
+        break;
+
+      case 'Escape':
+        event.preventDefault();
+        this.close();
+        break;
+    }
   }
 }
