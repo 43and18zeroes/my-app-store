@@ -5,11 +5,9 @@
   justify-content: center;
   align-items: center;
   position: relative;
-
-  // kein Opacity mehr auf dem Container selbst
   background: transparent;
 
-  // 🔥 eigene Overlay-Ebene per ::before
+  // dunkler Hintergrund über ::before
   &::before {
     content: "";
     position: fixed;
@@ -86,7 +84,7 @@
         object-fit: contain;
         cursor: grab;
         transition: none;
-        border-radius: 8px;
+        border-radius: 16px;
       }
 
       img.lb-img--hidden {

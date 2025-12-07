@@ -1,10 +1,13 @@
 import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   ElementRef,
   HostListener,
   Inject,
   NgZone,
+  OnDestroy,
   ViewChild,
 } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
@@ -20,7 +23,7 @@ export interface LightboxData {
   originRect?: DOMRect;
   thumbRects?: DOMRect[];
   onIndexChange?: (index: number) => void;
-  onCloseComplete?: () => void; // 👈 neu
+  onCloseComplete?: () => void;
 }
 
 @Component({
@@ -28,115 +31,196 @@ export interface LightboxData {
   standalone: true,
   imports: [MatIconModule],
   templateUrl: './lightbox-dialog.html',
-  styleUrl: './lightbox-dialog.scss',
+  styleUrls: ['./lightbox-dialog.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LightboxDialog {
-  @ViewChild('lightboxSwiper') swiperContainer!: ElementRef<HTMLElement>;
-  @ViewChild('animLayer') animLayer!: ElementRef<HTMLElement>;
+export class LightboxDialog implements AfterViewInit, OnDestroy {
+  @ViewChild('lightboxSwiper') private swiperContainer!: ElementRef<HTMLElement>;
+  @ViewChild('animLayer') private animLayer!: ElementRef<HTMLElement>;
 
+  /** Steuert, ob das aktuelle Bild wegen der Hero-Animation versteckt ist */
   hideInitialImage = true;
-  private openingAnimationRunning = false;
+
+  /** Steuert das Overlay (dunkler Hintergrund) */
   backgroundVisible = false;
 
-  private swiper?: Swiper;
+  /** Steuert die Overlays (Close-Button, Pfeile) */
+  hideOverlayButtons = true;
 
+  /** Aktueller Index im Swiper */
   currentIndex: number;
-  private closingAnimationRunning = false;
-  hideOverlyBtns = true;
 
-  private isMobileDevice(): boolean {
-    // recht robust: "coarse pointer" = Touch
-    return window.matchMedia?.('(pointer: coarse)').matches ?? false;
-  }
+  private swiper?: Swiper;
+  private openingAnimationRunning = false;
+  private closingAnimationRunning = false;
 
   constructor(
-    public dialogRef: MatDialogRef<LightboxDialog>,
-    @Inject(MAT_DIALOG_DATA) public data: LightboxData,
-    private zone: NgZone,
-    private cdr: ChangeDetectorRef
+    public readonly dialogRef: MatDialogRef<LightboxDialog, number>,
+    @Inject(MAT_DIALOG_DATA) public readonly data: LightboxData,
+    private readonly zone: NgZone,
+    private readonly cdr: ChangeDetectorRef
   ) {
-    this.currentIndex = data.initialIndex;
+    // defensiv clampen
+    const maxIndex = Math.max(data.images.length - 1, 0);
+    this.currentIndex = Math.min(Math.max(data.initialIndex ?? 0, 0), maxIndex);
   }
+
+  // ------------------------------------------------------
+  // Angular Lifecycle
+  // ------------------------------------------------------
 
   ngAfterViewInit(): void {
     this.initLightboxSwiper();
 
-    // Wenn keine Hero-Animation möglich → Bild direkt anzeigen
-    if (!this.data.originRect && !this.data.thumbRects) {
+    // Wenn keine Hero-Animation möglich → Bild sofort anzeigen
+    if (!this.hasHeroAnimationRect()) {
       this.hideInitialImage = false;
       this.cdr.detectChanges();
     }
 
+    // Hintergrund weich einblenden
     requestAnimationFrame(() => {
       this.backgroundVisible = true;
       this.cdr.detectChanges();
     });
   }
 
-  close(): void {
-    if (this.closingAnimationRunning) return;
-    this.hideOverlyBtns = true;
-    const thumbRects = this.data.thumbRects;
-
-    // Kein Thumbnail-Rect? → nur Fade-Out + Close
-    if (!thumbRects || !thumbRects[this.currentIndex]) {
-      this.backgroundVisible = false;
-      this.cdr.detectChanges();
-      setTimeout(() => this.dialogRef.close(), 300);
-      return;
+  ngOnDestroy(): void {
+    if (this.swiper) {
+      this.swiper.destroy(true, true);
+      this.swiper = undefined;
     }
-
-    const targetRect = thumbRects[this.currentIndex];
-
-    // Hintergrund zeitgleich ausfaden
-    this.backgroundVisible = false;
-    this.cdr.detectChanges();
-
-    const host = this.swiperContainer.nativeElement;
-    const activeSlide = host.querySelector(
-      '.swiper-slide.swiper-slide-active'
-    ) as HTMLElement | null;
-    const imgEl = activeSlide?.querySelector(
-      'img.lb-img'
-    ) as HTMLImageElement | null;
-
-    if (!imgEl) {
-      setTimeout(() => this.dialogRef.close(), 300);
-      return;
-    }
-
-    // 👇 WICHTIG: Lightbox-Bild direkt zum Start verstecken
-    this.hideInitialImage = true;
-    this.cdr.detectChanges();
-
-    this.playCloseAnimation(imgEl, targetRect);
   }
 
-  onInitialImageLoad(i: number, imgEl: HTMLImageElement) {
-    if (i !== this.data.initialIndex) return;
-    if (this.openingAnimationRunning) return;
+  // ------------------------------------------------------
+  // Public API (Template)
+  // ------------------------------------------------------
 
-    // Origin bevorzugt aus thumbRects, sonst originRect
-    const originRect = this.data.thumbRects?.[i] ?? this.data.originRect;
+  onCloseClick(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.close();
+  }
 
-    if (!originRect) {
-      // kein Rect → keine Hero-Animation, Bild einfach anzeigen
+  onCloseTouchEnd(event: TouchEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.close();
+  }
+
+  /**
+   * Wird aufgerufen, wenn ein Bild geladen wurde.
+   * Nur beim initialen Index wird die Hero-Animation gestartet.
+   */
+  onInitialImageLoad(index: number, event: Event): void {
+    if (index !== this.currentIndex || this.openingAnimationRunning) {
+      return;
+    }
+
+    const imgEl = event.target as HTMLImageElement | null;
+    if (!imgEl) {
+      // Fallback: kein Element → Bild einfach zeigen
       this.hideInitialImage = false;
       this.cdr.detectChanges();
       return;
     }
 
+    const originRect = this.getHeroOriginRect(index);
+    if (!originRect) {
+      // keine Hero-Animation möglich → Bild direkt sichtbar
+      this.hideInitialImage = false;
+      this.cdr.detectChanges();
+      return;
+    }
+
+    // Hero-Animation asynchron starten
     requestAnimationFrame(() => {
-      setTimeout(() => {
-        this.playOpenAnimation(imgEl, originRect);
-      }, 0);
+      this.playOpenAnimation(imgEl, originRect);
     });
   }
 
-  private playOpenAnimation(targetImg: HTMLImageElement, originRect: DOMRect) {
+  /**
+   * Tastatursteuerung: Pfeiltasten & ESC
+   */
+  @HostListener('document:keydown', ['$event'])
+  onKeydown(event: KeyboardEvent): void {
+    if (!this.swiper) return;
+
+    switch (event.key) {
+      case 'ArrowRight':
+      case 'Right':
+        event.preventDefault();
+        this.swiper.slideNext();
+        break;
+
+      case 'ArrowLeft':
+      case 'Left':
+        event.preventDefault();
+        this.swiper.slidePrev();
+        break;
+
+      case 'Escape':
+        event.preventDefault();
+        this.close();
+        break;
+    }
+  }
+
+  // ------------------------------------------------------
+  // Closing / Animations
+  // ------------------------------------------------------
+
+  close(): void {
+    if (this.closingAnimationRunning) return;
+
+    this.hideOverlayButtons = true;
+    this.cdr.markForCheck();
+
+    const thumbRect = this.data.thumbRects?.[this.currentIndex];
+
+    // Kein Thumbnail-Rect → nur Fade-Out
+    if (!thumbRect) {
+      this.backgroundVisible = false;
+      this.cdr.detectChanges();
+
+      setTimeout(() => {
+        this.data.onCloseComplete?.();
+        this.dialogRef.close(this.currentIndex);
+      }, 300);
+
+      return;
+    }
+
+    // Hintergrund gleichzeitig ausfaden
+    this.backgroundVisible = false;
+    this.cdr.detectChanges();
+
+    const imgEl = this.getActiveImageElement();
+    if (!imgEl) {
+      setTimeout(() => {
+        this.data.onCloseComplete?.();
+        this.dialogRef.close(this.currentIndex);
+      }, 300);
+      return;
+    }
+
+    // Lightbox-Bild für die Dauer der Animation verstecken
+    this.hideInitialImage = true;
+    this.cdr.detectChanges();
+
+    this.playCloseAnimation(imgEl, thumbRect);
+  }
+
+  private playOpenAnimation(targetImg: HTMLImageElement, originRect: DOMRect): void {
     this.openingAnimationRunning = true;
 
-    const layer = this.animLayer.nativeElement;
+    const layer = this.animLayer?.nativeElement;
+    if (!layer) {
+      this.openingAnimationRunning = false;
+      this.hideInitialImage = false;
+      this.cdr.detectChanges();
+      return;
+    }
 
     const clone = targetImg.cloneNode(true) as HTMLImageElement;
     clone.classList.add('anim-clone');
@@ -144,7 +228,7 @@ export class LightboxDialog {
 
     const finalRect = targetImg.getBoundingClientRect();
 
-    // Start: Thumbnail-Rect
+    // Start-Konfiguration (Thumbnail-Rect)
     Object.assign(clone.style, {
       position: 'fixed',
       top: `${originRect.top}px`,
@@ -152,16 +236,14 @@ export class LightboxDialog {
       width: `${originRect.width}px`,
       height: `${originRect.height}px`,
       transformOrigin: 'top left',
-      borderRadius: '2px',
+      borderRadius: '4px',
     });
 
-    // Differenzen zwischen Start- & Ziel-Rect
     const dx = finalRect.left - originRect.left;
     const dy = finalRect.top - originRect.top;
     const scaleX = finalRect.width / originRect.width;
     const scaleY = finalRect.height / originRect.height;
 
-    // Nur transform animieren
     const anim = clone.animate(
       [
         {
@@ -174,7 +256,7 @@ export class LightboxDialog {
         },
       ],
       {
-        duration: 280, // leicht kürzer wirkt oft "flüssiger"
+        duration: 280,
         easing: 'cubic-bezier(0.4, 0.0, 0.2, 1)',
         fill: 'forwards',
         composite: 'replace',
@@ -191,14 +273,15 @@ export class LightboxDialog {
     };
   }
 
-  private playCloseAnimation(targetImg: HTMLImageElement, targetRect: DOMRect) {
+  private playCloseAnimation(targetImg: HTMLImageElement, targetRect: DOMRect): void {
     this.closingAnimationRunning = true;
 
+    const layer = this.animLayer?.nativeElement;
     const startRect = targetImg.getBoundingClientRect();
 
     const clone = targetImg.cloneNode(true) as HTMLImageElement;
     clone.classList.add('anim-clone');
-    this.animLayer.nativeElement.appendChild(clone);
+    layer.appendChild(clone);
 
     Object.assign(clone.style, {
       position: 'fixed',
@@ -207,7 +290,7 @@ export class LightboxDialog {
       width: `${startRect.width}px`,
       height: `${startRect.height}px`,
       transformOrigin: 'top left',
-      borderRadius: '8px',
+      borderRadius: '16px',
       zIndex: '9999',
     });
 
@@ -245,16 +328,15 @@ export class LightboxDialog {
     };
   }
 
-  private initLightboxSwiper() {
-    this.hideOverlyBtns = false;
+  // ------------------------------------------------------
+  // Swiper Setup
+  // ------------------------------------------------------
+
+  private initLightboxSwiper(): void {
     const host = this.swiperContainer.nativeElement;
 
-    const nextEl = host.querySelector(
-      '.swiper-button-next'
-    ) as HTMLElement | null;
-    const prevEl = host.querySelector(
-      '.swiper-button-prev'
-    ) as HTMLElement | null;
+    const nextEl = host.querySelector('.swiper-button-next') as HTMLElement | null;
+    const prevEl = host.querySelector('.swiper-button-prev') as HTMLElement | null;
 
     const isMobile = this.isMobileDevice();
 
@@ -264,59 +346,55 @@ export class LightboxDialog {
       speed: isMobile ? 180 : 300,
       slidesPerView: 1,
       navigation: { nextEl, prevEl },
-      initialSlide: this.data.initialIndex,
+      initialSlide: this.currentIndex,
       zoom: { maxRatio: 3, minRatio: 1 },
       resistanceRatio: 0.8,
       on: {
         slideChange: (swiper) => {
           this.zone.run(() => {
             this.currentIndex = swiper.activeIndex;
-
-            // 👇 Preview-Swiper informieren
             this.data.onIndexChange?.(this.currentIndex);
-
             this.cdr.markForCheck();
           });
         },
       },
     };
 
-    this.swiper = new Swiper(host, config);
+    this.zone.runOutsideAngular(() => {
+      this.swiper = new Swiper(host, config);
+    });
+
+    // Overlays nach Init anzeigen
+    this.hideOverlayButtons = false;
+    this.cdr.markForCheck();
   }
 
-  onCloseClick(event: MouseEvent) {
-    event.preventDefault();
-    event.stopPropagation();
-    this.close();
+  // ------------------------------------------------------
+  // Helpers
+  // ------------------------------------------------------
+
+  private isMobileDevice(): boolean {
+    return window.matchMedia?.('(pointer: coarse)').matches ?? false;
   }
 
-  onCloseTouchEnd(event: TouchEvent) {
-    event.preventDefault();
-    event.stopPropagation();
-    this.close();
+  private hasHeroAnimationRect(): boolean {
+    return !!this.getHeroOriginRect(this.currentIndex);
   }
 
-  @HostListener('document:keydown', ['$event'])
-  onKeydown(event: KeyboardEvent) {
-    if (!this.swiper) return;
+  private getHeroOriginRect(index: number): DOMRect | undefined {
+    return this.data.thumbRects?.[index] ?? this.data.originRect;
+  }
 
-    switch (event.key) {
-      case 'ArrowRight':
-      case 'Right': // ältere Browser
-        event.preventDefault();
-        this.swiper.slideNext();
-        break;
+  private getActiveImageElement(): HTMLImageElement | null {
+    const host = this.swiperContainer?.nativeElement;
+    if (!host) return null;
 
-      case 'ArrowLeft':
-      case 'Left':
-        event.preventDefault();
-        this.swiper.slidePrev();
-        break;
+    const activeSlide = host.querySelector(
+      '.swiper-slide.swiper-slide-active'
+    ) as HTMLElement | null;
 
-      case 'Escape':
-        event.preventDefault();
-        this.close();
-        break;
-    }
+    if (!activeSlide) return null;
+
+    return activeSlide.querySelector('img.lb-img') as HTMLImageElement | null;
   }
 }
