@@ -163,6 +163,7 @@ export class PreviewSwiper {
       enterAnimationDuration: '0ms',
       exitAnimationDuration: '0ms',
       hasBackdrop: false,
+      disableClose: true,
       data: {
         images: this.images,
         initialIndex: index,
