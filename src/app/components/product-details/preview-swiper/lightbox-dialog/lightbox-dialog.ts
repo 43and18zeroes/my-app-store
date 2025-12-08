@@ -38,16 +38,12 @@ export class LightboxDialog implements AfterViewInit, OnDestroy {
   @ViewChild('lightboxSwiper') private swiperContainer!: ElementRef<HTMLElement>;
   @ViewChild('animLayer') private animLayer!: ElementRef<HTMLElement>;
 
-  /** Steuert, ob das aktuelle Bild wegen der Hero-Animation versteckt ist */
   hideInitialImage = true;
 
-  /** Steuert das Overlay (dunkler Hintergrund) */
   backgroundVisible = false;
 
-  /** Steuert die Overlays (Close-Button, Pfeile) */
   hideOverlayButtons = true;
 
-  /** Aktueller Index im Swiper */
   currentIndex: number;
 
   private swiper?: Swiper;
@@ -60,25 +56,18 @@ export class LightboxDialog implements AfterViewInit, OnDestroy {
     private readonly zone: NgZone,
     private readonly cdr: ChangeDetectorRef
   ) {
-    // defensiv clampen
     const maxIndex = Math.max(data.images.length - 1, 0);
     this.currentIndex = Math.min(Math.max(data.initialIndex ?? 0, 0), maxIndex);
   }
 
-  // ------------------------------------------------------
-  // Angular Lifecycle
-  // ------------------------------------------------------
-
   ngAfterViewInit(): void {
     this.initLightboxSwiper();
 
-    // Wenn keine Hero-Animation möglich → Bild sofort anzeigen
     if (!this.hasHeroAnimationRect()) {
       this.hideInitialImage = false;
       this.cdr.detectChanges();
     }
 
-    // Hintergrund weich einblenden
     requestAnimationFrame(() => {
       this.backgroundVisible = true;
       this.cdr.detectChanges();
@@ -92,10 +81,6 @@ export class LightboxDialog implements AfterViewInit, OnDestroy {
     }
   }
 
-  // ------------------------------------------------------
-  // Public API (Template)
-  // ------------------------------------------------------
-
   onCloseClick(event: MouseEvent): void {
     event.preventDefault();
     event.stopPropagation();
@@ -108,10 +93,6 @@ export class LightboxDialog implements AfterViewInit, OnDestroy {
     this.close();
   }
 
-  /**
-   * Wird aufgerufen, wenn ein Bild geladen wurde.
-   * Nur beim initialen Index wird die Hero-Animation gestartet.
-   */
   onInitialImageLoad(index: number, event: Event): void {
     if (index !== this.currentIndex || this.openingAnimationRunning) {
       return;
@@ -119,7 +100,6 @@ export class LightboxDialog implements AfterViewInit, OnDestroy {
 
     const imgEl = event.target as HTMLImageElement | null;
     if (!imgEl) {
-      // Fallback: kein Element → Bild einfach zeigen
       this.hideInitialImage = false;
       this.cdr.detectChanges();
       return;
@@ -127,21 +107,16 @@ export class LightboxDialog implements AfterViewInit, OnDestroy {
 
     const originRect = this.getHeroOriginRect(index);
     if (!originRect) {
-      // keine Hero-Animation möglich → Bild direkt sichtbar
       this.hideInitialImage = false;
       this.cdr.detectChanges();
       return;
     }
 
-    // Hero-Animation asynchron starten
     requestAnimationFrame(() => {
       this.playOpenAnimation(imgEl, originRect);
     });
   }
 
-  /**
-   * Tastatursteuerung: Pfeiltasten & ESC
-   */
   @HostListener('document:keydown', ['$event'])
   onKeydown(event: KeyboardEvent): void {
     if (!this.swiper) return;
@@ -166,10 +141,6 @@ export class LightboxDialog implements AfterViewInit, OnDestroy {
     }
   }
 
-  // ------------------------------------------------------
-  // Closing / Animations
-  // ------------------------------------------------------
-
   close(): void {
     if (this.closingAnimationRunning) return;
 
@@ -178,7 +149,6 @@ export class LightboxDialog implements AfterViewInit, OnDestroy {
 
     const thumbRect = this.data.thumbRects?.[this.currentIndex];
 
-    // Kein Thumbnail-Rect → nur Fade-Out
     if (!thumbRect) {
       this.backgroundVisible = false;
       this.cdr.detectChanges();
@@ -191,7 +161,6 @@ export class LightboxDialog implements AfterViewInit, OnDestroy {
       return;
     }
 
-    // Hintergrund gleichzeitig ausfaden
     this.backgroundVisible = false;
     this.cdr.detectChanges();
 
@@ -204,7 +173,6 @@ export class LightboxDialog implements AfterViewInit, OnDestroy {
       return;
     }
 
-    // Lightbox-Bild für die Dauer der Animation verstecken
     this.hideInitialImage = true;
     this.cdr.detectChanges();
 
@@ -228,7 +196,6 @@ export class LightboxDialog implements AfterViewInit, OnDestroy {
 
     const finalRect = targetImg.getBoundingClientRect();
 
-    // Start-Konfiguration (Thumbnail-Rect)
     Object.assign(clone.style, {
       position: 'fixed',
       top: `${originRect.top}px`,
@@ -327,11 +294,6 @@ export class LightboxDialog implements AfterViewInit, OnDestroy {
       });
     };
   }
-
-  // ------------------------------------------------------
-  // Swiper Setup
-  // ------------------------------------------------------
-
   private initLightboxSwiper(): void {
     const host = this.swiperContainer.nativeElement;
 
@@ -364,14 +326,9 @@ export class LightboxDialog implements AfterViewInit, OnDestroy {
       this.swiper = new Swiper(host, config);
     });
 
-    // Overlays nach Init anzeigen
     this.hideOverlayButtons = false;
     this.cdr.markForCheck();
   }
-
-  // ------------------------------------------------------
-  // Helpers
-  // ------------------------------------------------------
 
   private isMobileDevice(): boolean {
     return window.matchMedia?.('(pointer: coarse)').matches ?? false;
