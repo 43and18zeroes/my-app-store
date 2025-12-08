@@ -15,6 +15,11 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import Swiper from 'swiper';
 import { Navigation, Zoom } from 'swiper/modules';
 import { SwiperOptions } from 'swiper/types';
+import {
+  playOpenHeroAnimation,
+  playCloseHeroAnimation,
+} from './lightbox-hero-animation';
+import { isMobileDevice, getHeroOriginRect } from './lightbox-utils';
 
 export interface LightboxData {
   images: string[];
@@ -35,7 +40,8 @@ export interface LightboxData {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LightboxDialog implements AfterViewInit, OnDestroy {
-  @ViewChild('lightboxSwiper') private swiperContainer!: ElementRef<HTMLElement>;
+  @ViewChild('lightboxSwiper')
+  private swiperContainer!: ElementRef<HTMLElement>;
   @ViewChild('animLayer') private animLayer!: ElementRef<HTMLElement>;
 
   hideInitialImage = true;
@@ -179,7 +185,10 @@ export class LightboxDialog implements AfterViewInit, OnDestroy {
     this.playCloseAnimation(imgEl, thumbRect);
   }
 
-  private playOpenAnimation(targetImg: HTMLImageElement, originRect: DOMRect): void {
+  private playOpenAnimation(
+    targetImg: HTMLImageElement,
+    originRect: DOMRect
+  ): void {
     this.openingAnimationRunning = true;
 
     const layer = this.animLayer?.nativeElement;
@@ -190,117 +199,55 @@ export class LightboxDialog implements AfterViewInit, OnDestroy {
       return;
     }
 
-    const clone = targetImg.cloneNode(true) as HTMLImageElement;
-    clone.classList.add('anim-clone');
-    layer.appendChild(clone);
-
-    const finalRect = targetImg.getBoundingClientRect();
-
-    Object.assign(clone.style, {
-      position: 'fixed',
-      top: `${originRect.top}px`,
-      left: `${originRect.left}px`,
-      width: `${originRect.width}px`,
-      height: `${originRect.height}px`,
-      transformOrigin: 'top left',
-      borderRadius: '4px',
-    });
-
-    const dx = finalRect.left - originRect.left;
-    const dy = finalRect.top - originRect.top;
-    const scaleX = finalRect.width / originRect.width;
-    const scaleY = finalRect.height / originRect.height;
-
-    const anim = clone.animate(
-      [
-        {
-          transform: 'translate3d(0, 0, 0) scale(1, 1)',
-          opacity: 1,
-        },
-        {
-          transform: `translate3d(${dx}px, ${dy}px, 0) scale(${scaleX}, ${scaleY})`,
-          opacity: 1,
-        },
-      ],
-      {
-        duration: 280,
-        easing: 'cubic-bezier(0.4, 0.0, 0.2, 1)',
-        fill: 'forwards',
-        composite: 'replace',
-      }
-    );
-
-    anim.onfinish = () => {
+    playOpenHeroAnimation({
+      targetImg,
+      originRect,
+      animLayer: layer,
+    }).then(() => {
       this.zone.run(() => {
-        clone.remove();
         this.hideInitialImage = false;
         this.openingAnimationRunning = false;
         this.cdr.detectChanges();
       });
-    };
+    });
   }
 
-  private playCloseAnimation(targetImg: HTMLImageElement, targetRect: DOMRect): void {
+  private playCloseAnimation(
+    targetImg: HTMLImageElement,
+    targetRect: DOMRect
+  ): void {
     this.closingAnimationRunning = true;
 
     const layer = this.animLayer?.nativeElement;
-    const startRect = targetImg.getBoundingClientRect();
+    if (!layer) {
+      this.closingAnimationRunning = false;
+      this.data.onCloseComplete?.();
+      this.dialogRef.close(this.currentIndex);
+      return;
+    }
 
-    const clone = targetImg.cloneNode(true) as HTMLImageElement;
-    clone.classList.add('anim-clone');
-    layer.appendChild(clone);
-
-    Object.assign(clone.style, {
-      position: 'fixed',
-      top: `${startRect.top}px`,
-      left: `${startRect.left}px`,
-      width: `${startRect.width}px`,
-      height: `${startRect.height}px`,
-      transformOrigin: 'top left',
-      borderRadius: '16px',
-      zIndex: '9999',
-    });
-
-    const dx = targetRect.left - startRect.left;
-    const dy = targetRect.top - startRect.top;
-    const scaleX = targetRect.width / startRect.width;
-    const scaleY = targetRect.height / startRect.height;
-
-    const anim = clone.animate(
-      [
-        {
-          transform: 'translate3d(0, 0, 0) scale(1, 1)',
-          opacity: 1,
-        },
-        {
-          transform: `translate3d(${dx}px, ${dy}px, 0) scale(${scaleX}, ${scaleY})`,
-          opacity: 1,
-        },
-      ],
-      {
-        duration: 280,
-        easing: 'cubic-bezier(0.4, 0.0, 0.2, 1)',
-        fill: 'forwards',
-        composite: 'replace',
-      }
-    );
-
-    anim.onfinish = () => {
+    playCloseHeroAnimation({
+      targetImg,
+      targetRect,
+      animLayer: layer,
+    }).then(() => {
       this.zone.run(() => {
-        clone.remove();
         this.closingAnimationRunning = false;
         this.data.onCloseComplete?.();
         this.dialogRef.close(this.currentIndex);
       });
-    };
+    });
   }
+
   private initLightboxSwiper(): void {
+    const isMobile = isMobileDevice();
     const host = this.swiperContainer.nativeElement;
-
-    const nextEl = host.querySelector('.swiper-button-next') as HTMLElement | null;
-    const prevEl = host.querySelector('.swiper-button-prev') as HTMLElement | null;
-
-    const isMobile = this.isMobileDevice();
+    const nextEl = host.querySelector(
+      '.swiper-button-next'
+    ) as HTMLElement | null;
+    const prevEl = host.querySelector(
+      '.swiper-button-prev'
+    ) as HTMLElement | null;
 
     const config: SwiperOptions = {
       modules: [Navigation, Zoom],
@@ -335,11 +282,15 @@ export class LightboxDialog implements AfterViewInit, OnDestroy {
   }
 
   private hasHeroAnimationRect(): boolean {
-    return !!this.getHeroOriginRect(this.currentIndex);
+    return !!getHeroOriginRect(
+      this.currentIndex,
+      this.data.thumbRects,
+      this.data.originRect
+    );
   }
 
   private getHeroOriginRect(index: number): DOMRect | undefined {
-    return this.data.thumbRects?.[index] ?? this.data.originRect;
+    return getHeroOriginRect(index, this.data.thumbRects, this.data.originRect);
   }
 
   private getActiveImageElement(): HTMLImageElement | null {
