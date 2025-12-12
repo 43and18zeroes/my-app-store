@@ -5,7 +5,7 @@ import {
   SectionItem,
 } from '../../pages/applications/applications.data';
 import { CommonModule } from '@angular/common';
-import { PreviewSwiper } from "./preview-swiper/preview-swiper";
+import { PreviewSwiper } from './preview-swiper/preview-swiper';
 
 @Component({
   selector: 'app-product-details',
@@ -18,7 +18,9 @@ export class ProductDetails {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
-  readonly productId = signal<string>(this.route.snapshot.paramMap.get('productId') ?? '');
+  readonly productId = signal<string>(
+    this.route.snapshot.paramMap.get('productId') ?? ''
+  );
 
   readonly productBasePath = (() => {
     const path = this.router.url.split('?')[0];
@@ -30,7 +32,8 @@ export class ProductDetails {
     .state as SectionItem | undefined;
 
   readonly item = computed<SectionItem | undefined>(() => {
-    if (this.navState && this.navState.productId === this.productId()) return this.navState;
+    if (this.navState && this.navState.productId === this.productId())
+      return this.navState;
     return SECTION.find((s) => s.productId === this.productId());
   });
 }
