@@ -1,0 +1,10 @@
+RewriteEngine On
+
+# Wenn direkt eine Datei angefragt wird, nie rewriten
+RewriteRule \.(js|mjs|css|map|json|png|jpg|jpeg|gif|svg|webp|ico|woff2?)$ - [L]
+
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+RewriteRule ^ index.html [L]
