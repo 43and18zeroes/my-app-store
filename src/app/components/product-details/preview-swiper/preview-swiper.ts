@@ -3,6 +3,7 @@ import {
   Component,
   ElementRef,
   EventEmitter,
+  Injector,
   Input,
   Output,
   ViewChild,
@@ -14,8 +15,6 @@ import { Navigation, FreeMode } from 'swiper/modules';
 import { SwiperOptions } from 'swiper/types';
 import { PortalModule } from '@angular/cdk/portal';
 import { MatIconModule } from '@angular/material/icon';
-import { MatDialog } from '@angular/material/dialog';
-import { LightboxDialog } from './lightbox-dialog/lightbox-dialog';
 
 @Component({
   selector: 'app-preview-swiper',
@@ -26,7 +25,7 @@ import { LightboxDialog } from './lightbox-dialog/lightbox-dialog';
 export class PreviewSwiper {
   private http = inject(HttpClient);
   private cdr = inject(ChangeDetectorRef);
-  private dialog = inject(MatDialog);
+  private injector = inject(Injector);
 
   @Input() productPreviewsPath!: string;
   @Output() select = new EventEmitter<string>();
@@ -72,8 +71,10 @@ export class PreviewSwiper {
     const host = this.swiperContainer?.nativeElement;
     if (!host) return;
 
-    const nextEl = host.querySelector<HTMLElement>('.swiper-button-next') ?? undefined;
-    const prevEl = host.querySelector<HTMLElement>('.swiper-button-prev') ?? undefined;
+    const nextEl =
+      host.querySelector<HTMLElement>('.swiper-button-next') ?? undefined;
+    const prevEl =
+      host.querySelector<HTMLElement>('.swiper-button-prev') ?? undefined;
 
     const navigationCfg = nextEl && prevEl ? { nextEl, prevEl } : false;
 
@@ -136,7 +137,13 @@ export class PreviewSwiper {
     }
   }
 
-  openLightbox(index: number, ev: Event) {
+  async openLightbox(index: number, ev: Event) {
+    const [{ MatDialog }, { LightboxDialog }] = await Promise.all([
+      import('@angular/material/dialog'),
+      import('./lightbox-dialog/lightbox-dialog'),
+    ]);
+
+    const dialog = this.injector.get(MatDialog);
     this.openingIndex = index;
 
     const host = this.swiperContainer.nativeElement;
@@ -152,7 +159,7 @@ export class PreviewSwiper {
     const imgEl = target?.querySelector('img') as HTMLImageElement | null;
     const originRect = imgEl?.getBoundingClientRect() ?? thumbRects[index];
 
-    const ref = this.dialog.open(LightboxDialog, {
+    const ref = dialog.open(LightboxDialog, {
       panelClass: 'full-screen-lightbox',
       maxWidth: '100vw',
       maxHeight: '100vh',
@@ -179,7 +186,6 @@ export class PreviewSwiper {
       },
     });
 
-    ref.afterClosed().subscribe(() => {
-    });
+    ref.afterClosed().subscribe(() => {});
   }
 }
