@@ -11,7 +11,6 @@ import {
 import { HttpClient } from '@angular/common/http';
 import Swiper from 'swiper';
 import { Navigation, FreeMode } from 'swiper/modules';
-import 'swiper/swiper-bundle.css';
 import { SwiperOptions } from 'swiper/types';
 import { PortalModule } from '@angular/cdk/portal';
 import { MatIconModule } from '@angular/material/icon';
@@ -137,7 +136,6 @@ export class PreviewSwiper {
     }
   }
 
-  // Lightbox
   openLightbox(index: number, ev: Event) {
     this.openingIndex = index;
 
@@ -182,7 +180,6 @@ export class PreviewSwiper {
     });
 
     ref.afterClosed().subscribe(() => {
-      // nichts mehr mit openingIndex
     });
   }
 }
