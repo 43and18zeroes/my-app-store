@@ -9,7 +9,6 @@ import {
 } from '@angular/core';
 import Swiper from 'swiper';
 import { Navigation } from 'swiper/modules';
-import 'swiper/swiper-bundle.css';
 import { SwiperOptions } from 'swiper/types';
 import { CommonModule } from '@angular/common';
 

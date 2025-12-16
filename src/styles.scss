@@ -1,5 +1,6 @@
 @use "@angular/material" as mat;
-@use "swiper/swiper-bundle.css";
+@use "swiper/css";
+@use "swiper/css/navigation";
 
 html {
   color-scheme: light dark;
