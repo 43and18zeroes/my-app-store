@@ -185,7 +185,5 @@ export class PreviewSwiper {
         },
       },
     });
-
-    ref.afterClosed().subscribe(() => {});
   }
 }
