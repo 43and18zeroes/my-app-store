@@ -4,8 +4,8 @@
 >
   <div
     class="close-button-area"
-    (click)="onCloseClick($event)"
-    (touchend)="onCloseTouchEnd($event)"
+    (click)="closeFromEvent($event)"
+    (touchend)="closeFromEvent($event)"
     [class.overlay-btns-hidden]="hideOverlayButtons"
   >
     <button mat-icon-button class="close-button overlay-btns">

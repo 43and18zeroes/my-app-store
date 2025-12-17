@@ -87,13 +87,7 @@ export class LightboxDialog implements AfterViewInit, OnDestroy {
     }
   }
 
-  onCloseClick(event: MouseEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
-    this.close();
-  }
-
-  onCloseTouchEnd(event: TouchEvent): void {
+  closeFromEvent(event: Event): void {
     event.preventDefault();
     event.stopPropagation();
     this.close();
