@@ -112,14 +112,12 @@ h2 {
 }
 
 .full-screen-lightbox {
-  // Entfernt den Standard-Hintergrund des Dialogs
   background: transparent !important;
-  // Setzt den Hintergrund der Lightbox auf Schwarz
   .mat-mdc-dialog-surface {
     background: rgba(0, 0, 0, 0);
     box-shadow: none !important;
     border-radius: 0 !important;
-    padding: 0 !important; // Wichtig: Entfernt Dialog-Padding
+    padding: 0 !important;
   }
 }
 
