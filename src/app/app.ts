@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, HostListener, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -7,7 +7,6 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { CustomSidenav } from './components/custom-sidenav/custom-sidenav';
 import { ThemeService } from './services/theme-service';
 import { RouterOutlet } from '@angular/router';
-import { debounceTime, fromEvent, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -29,25 +28,20 @@ export class App {
   themeService = inject(ThemeService);
   collapsed = signal(true);
   viewportWidth = signal(window.innerWidth);
-  private resizeSub?: Subscription;
 
   constructor() {}
 
   ngOnInit() {
     this.themeService.initTheme();
-    this.resizeSub = fromEvent(window, 'resize')
-      .pipe(debounceTime(100))
-      .subscribe(() => {
-        this.viewportWidth.set(window.innerWidth);
-        this.collapsed.set(true);
-      });
+  }
+
+  @HostListener('window:resize')
+  onResize() {
+    this.viewportWidth.set(window.innerWidth);
+    this.collapsed.set(true);
   }
 
   collapseSidenav() {
     this.collapsed.set(true);
-  }
-
-  ngOnDestroy() {
-    this.resizeSub?.unsubscribe();
   }
 }
