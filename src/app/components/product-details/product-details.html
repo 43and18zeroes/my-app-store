@@ -15,10 +15,16 @@
 </header>
 <p class="descriptionMobile">{{ item()!.productDescription }}</p>
 
+@defer (on viewport; prefetch on idle) {
 <app-preview-swiper
   [productPreviewsPath]="item()?.productPreviewsPath || ''"
 ></app-preview-swiper>
-
-} @else {
+} @placeholder (minimum 500ms) {
+<div class="swiper-loader-placeholder">
+  <div class="spinner"></div>
+</div>
+} @error {
+<p>Could not load gallery.</p>
+} } @else {
 <p>No entry found (ID: {{ productId() }})</p>
 }
