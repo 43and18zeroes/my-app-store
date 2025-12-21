@@ -26,6 +26,7 @@ export class PreviewSwiper {
   private http = inject(HttpClient);
   private cdr = inject(ChangeDetectorRef);
   private injector = inject(Injector);
+  readonly stepSize = 3;
 
   @Input() productPreviewsPath!: string;
   @Output() select = new EventEmitter<string>();
@@ -117,19 +118,19 @@ export class PreviewSwiper {
     this.swiper = new Swiper(host, baseConfig);
   }
 
-  nextN(n = 1) {
+  nextN() {
     if (!this.swiper) return;
     this.swiper.slideTo(
       Math.min(
-        this.swiper.activeIndex + n,
+        this.swiper.activeIndex + this.stepSize,
         (this.swiper.slides?.length ?? 1) - 1
       )
     );
   }
 
-  prevN(n = 1) {
+  prevN() {
     if (!this.swiper) return;
-    this.swiper.slideTo(Math.max(this.swiper.activeIndex - n, 0));
+    this.swiper.slideTo(Math.max(this.swiper.activeIndex - this.stepSize, 0));
   }
 
   private destroySwiper() {
