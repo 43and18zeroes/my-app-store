@@ -47,11 +47,13 @@ export class PreviewSwiper {
     this.http.get<string[]>(url).subscribe({
       next: (data) => {
         this.images = data ?? [];
-        this.cdr.detectChanges();
+        // Use markForCheck instead of detectChanges to be safer
+        this.cdr.markForCheck();
 
-        requestAnimationFrame(() => {
-          this.initSwiper();
-        });
+        // Swiper needs the DOM to be rendered,
+        // wrapping in setTimeout(0) is usually safer than requestAnimationFrame
+        // when dealing with Angular's lifecycle.
+        setTimeout(() => this.initSwiper(), 0);
       },
       error: (err) => {
         console.error('gallery.json nicht gefunden:', url, err);
@@ -138,16 +140,14 @@ export class PreviewSwiper {
   }
 
   async openLightbox(index: number, ev: Event) {
+    this.openingIndex = index;
     const [{ MatDialog }, { LightboxDialog }] = await Promise.all([
       import('@angular/material/dialog'),
       import('./lightbox-dialog/lightbox-dialog'),
     ]);
 
     const dialog = this.injector.get(MatDialog);
-    this.openingIndex = index;
-
     const host = this.swiperContainer.nativeElement;
-
     const previewImgs = host.querySelectorAll(
       'img.preview-img'
     ) as NodeListOf<HTMLImageElement>;
@@ -176,8 +176,10 @@ export class PreviewSwiper {
         originRect,
         thumbRects,
         onIndexChange: (idx: number) => {
-          this.openingIndex = idx;
-          this.cdr.markForCheck();
+          setTimeout(() => {
+            this.openingIndex = idx;
+            this.cdr.markForCheck();
+          });
         },
         onCloseComplete: () => {
           this.openingIndex = null;
