@@ -19,10 +19,8 @@
 <app-preview-swiper
   [productPreviewsPath]="item()?.productPreviewsPath || ''"
 ></app-preview-swiper>
-} @placeholder (minimum 500ms) {
-<div class="swiper-loader-placeholder">
-  <div class="spinner"></div>
-</div>
+} @placeholder {
+<div></div>
 } @error {
 <p>Could not load gallery.</p>
 } } @else {
