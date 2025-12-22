@@ -5,7 +5,7 @@
     {
     <a
       class="swiper-slide no__highlight"
-      [attr.aria-label]="thumbnailData.productLogoAltText || 'Produkt öffnen'"
+      [attr.aria-label]="thumbnailData.productLogoAltText || 'Open product'"
       (click)="$event.stopPropagation(); select.emit(thumbnailData)"
     >
       <img
