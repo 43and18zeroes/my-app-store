@@ -33,5 +33,10 @@ export const routes: Routes = [
     title: 'Product Details - My App Store',
     loadComponent: () => import('./components/product-details/product-details').then(m => m.ProductDetails) 
   },
-  { path: '**', redirectTo: '' },
+  {
+  path: '**',
+  title: '404 - Page not found - My App Store',
+  loadComponent: () =>
+    import('./pages/not-found/not-found').then(m => m.NotFound),
+},
 ];
