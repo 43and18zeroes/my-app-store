@@ -48,12 +48,7 @@ export class PreviewSwiper {
     this.http.get<string[]>(url).subscribe({
       next: (data) => {
         this.images = data ?? [];
-        // Use markForCheck instead of detectChanges to be safer
         this.cdr.markForCheck();
-
-        // Swiper needs the DOM to be rendered,
-        // wrapping in setTimeout(0) is usually safer than requestAnimationFrame
-        // when dealing with Angular's lifecycle.
         setTimeout(() => this.initSwiper(), 0);
       },
       error: (err) => {
