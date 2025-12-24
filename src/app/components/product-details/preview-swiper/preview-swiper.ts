@@ -136,7 +136,6 @@ export class PreviewSwiper {
   }
 
   async openLightbox(index: number, ev: Event) {
-    this.openingIndex = index;
     const [{ MatDialog }, { LightboxDialog }] = await Promise.all([
       import('@angular/material/dialog'),
       import('./lightbox-dialog/lightbox-dialog'),
@@ -144,9 +143,11 @@ export class PreviewSwiper {
 
     const dialog = this.injector.get(MatDialog);
     const host = this.swiperContainer.nativeElement;
+
     const previewImgs = host.querySelectorAll(
       'img.preview-img'
     ) as NodeListOf<HTMLImageElement>;
+
     const thumbRects = Array.from(previewImgs).map((img) =>
       img.getBoundingClientRect()
     );
@@ -172,7 +173,9 @@ export class PreviewSwiper {
         originRect,
         thumbRects,
         onIndexChange: (idx: number) => {
-          setTimeout(() => {
+          this.openingIndex = null;
+          this.cdr.markForCheck();
+          requestAnimationFrame(() => {
             this.openingIndex = idx;
             this.cdr.markForCheck();
           });
@@ -182,6 +185,12 @@ export class PreviewSwiper {
           this.cdr.markForCheck();
         },
       },
+    });
+    ref.afterOpened().subscribe(() => {
+      requestAnimationFrame(() => {
+        this.openingIndex = index;
+        this.cdr.markForCheck();
+      });
     });
   }
 }
