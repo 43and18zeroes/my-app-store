@@ -10,13 +10,29 @@ export class PreviewSwiperAdapter {
 
   init(host: HTMLElement) {
     this.destroy();
+    this.swiper = new Swiper(host, this.buildConfig(host));
+  }
 
+  private buildConfig(host: HTMLElement): SwiperOptions {
+    return {
+      modules: [Navigation, FreeMode],
+      loop: false,
+      freeMode: this.freeModeCfg(),
+      slidesPerView: 'auto',
+      navigation: this.navigationCfg(host),
+      speed: 500,
+      breakpoints: this.breakpointsCfg(),
+    };
+  }
+
+  private navigationCfg(host: HTMLElement): SwiperOptions['navigation'] | false {
     const nextEl = host.querySelector<HTMLElement>('.swiper-button-next') ?? undefined;
     const prevEl = host.querySelector<HTMLElement>('.swiper-button-prev') ?? undefined;
+    return nextEl && prevEl ? { nextEl, prevEl } : false;
+  }
 
-    const navigationCfg = nextEl && prevEl ? { nextEl, prevEl } : false;
-
-    const freeModeCfg: NonNullable<SwiperOptions['freeMode']> = {
+  private freeModeCfg(): NonNullable<SwiperOptions['freeMode']> {
+    return {
       enabled: true,
       momentumRatio: 0.5,
       momentumVelocityRatio: 0.5,
@@ -24,21 +40,13 @@ export class PreviewSwiperAdapter {
       momentumBounceRatio: 1,
       sticky: false,
     };
+  }
 
-    const config: SwiperOptions = {
-      modules: [Navigation, FreeMode],
-      loop: false,
-      freeMode: freeModeCfg,
-      slidesPerView: 'auto',
-      navigation: navigationCfg,
-      speed: 500,
-      breakpoints: {
-        0: { spaceBetween: 10, speed: 200, navigation: { enabled: false } },
-        922: { spaceBetween: 20, speed: 500, navigation: { enabled: true } },
-      },
+  private breakpointsCfg(): NonNullable<SwiperOptions['breakpoints']> {
+    return {
+      0: { spaceBetween: 10, speed: 200, navigation: { enabled: false } },
+      922: { spaceBetween: 20, speed: 500, navigation: { enabled: true } },
     };
-
-    this.swiper = new Swiper(host, config);
   }
 
   nextN() {
