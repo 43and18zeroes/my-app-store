@@ -3,6 +3,22 @@ import { Injectable, Injector, ChangeDetectorRef } from '@angular/core';
 
 type Rect = DOMRect;
 
+export type PreviewLightboxParams = {
+  host: HTMLElement;
+  images: string[];
+  initialIndex: number;
+  imgBaseUrl: (file: string) => string;
+
+  cdr: ChangeDetectorRef;
+  setOpeningIndex: (v: number | null) => void;
+  ev: Event;
+};
+
+type LightboxDeps = {
+  dialog: any;
+  LightboxDialog: any;
+};
+
 @Injectable({ providedIn: 'root' })
 export class PreviewLightboxService {
   constructor(private injector: Injector) {}
@@ -18,27 +34,55 @@ export class PreviewLightboxService {
     return imgEl?.getBoundingClientRect() ?? fallback;
   }
 
-  async open(params: {
-    host: HTMLElement;
-    images: string[];
-    initialIndex: number;
-    imgBaseUrl: (file: string) => string;
+  private indexAnimator(params: PreviewLightboxParams) {
+    return {
+      set(idx: number | null) {
+        params.setOpeningIndex(idx);
+        params.cdr.markForCheck();
+      },
+      setOnNextFrame(idx: number | null) {
+        requestAnimationFrame(() => {
+          params.setOpeningIndex(idx);
+          params.cdr.markForCheck();
+        });
+      },
+      onIndexChange: (idx: number) => {
+        params.setOpeningIndex(null);
+        params.cdr.markForCheck();
+        requestAnimationFrame(() => {
+          params.setOpeningIndex(idx);
+          params.cdr.markForCheck();
+        });
+      },
+      onCloseComplete: () => {
+        params.setOpeningIndex(null);
+        params.cdr.markForCheck();
+      },
+      afterOpened: () => {
+        requestAnimationFrame(() => {
+          params.setOpeningIndex(params.initialIndex);
+          params.cdr.markForCheck();
+        });
+      },
+    };
+  }
 
-    cdr: ChangeDetectorRef;
-    setOpeningIndex: (v: number | null) => void;
-    ev: Event;
-  }) {
+  private async loadDeps(): Promise<LightboxDeps> {
     const [{ MatDialog }, { LightboxDialog }] = await Promise.all([
       import('@angular/material/dialog'),
       import('./lightbox-dialog/lightbox-dialog'),
     ]);
 
-    const dialog = this.injector.get(MatDialog);
+    return {
+      dialog: this.injector.get(MatDialog),
+      LightboxDialog,
+    };
+  }
 
-    const thumbRects = this.collectThumbRects(params.host);
-    const originRect = this.originRectFromEvent(params.ev, thumbRects[params.initialIndex]);
+  private buildDialogConfig(params: PreviewLightboxParams, originRect: Rect, thumbRects: Rect[]) {
+    const anim = this.indexAnimator(params);
 
-    const ref = dialog.open(LightboxDialog, {
+    return {
       panelClass: 'full-screen-lightbox',
       maxWidth: '100vw',
       maxHeight: '100vh',
@@ -54,27 +98,25 @@ export class PreviewLightboxService {
         imgBaseUrl: params.imgBaseUrl,
         originRect,
         thumbRects,
-        onIndexChange: (idx: number) => {
-          params.setOpeningIndex(null);
-          params.cdr.markForCheck();
-          requestAnimationFrame(() => {
-            params.setOpeningIndex(idx);
-            params.cdr.markForCheck();
-          });
-        },
-        onCloseComplete: () => {
-          params.setOpeningIndex(null);
-          params.cdr.markForCheck();
-        },
+        onIndexChange: anim.onIndexChange,
+        onCloseComplete: anim.onCloseComplete,
       },
-    });
+      __anim: anim,
+    };
+  }
 
-    ref.afterOpened().subscribe(() => {
-      requestAnimationFrame(() => {
-        params.setOpeningIndex(params.initialIndex);
-        params.cdr.markForCheck();
-      });
-    });
+  async open(params: PreviewLightboxParams) {
+    const { dialog, LightboxDialog } = await this.loadDeps();
+
+    const thumbRects = this.collectThumbRects(params.host);
+    const originRect = this.originRectFromEvent(params.ev, thumbRects[params.initialIndex]);
+
+    const cfg = this.buildDialogConfig(params, originRect, thumbRects);
+    const { __anim, ...matCfg } = cfg as any;
+
+    const ref = dialog.open(LightboxDialog, matCfg);
+
+    ref.afterOpened().subscribe(() => __anim.afterOpened());
 
     return ref;
   }
