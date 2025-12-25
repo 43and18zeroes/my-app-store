@@ -88,5 +88,5 @@ src/
 4. Deploy:
 
     ```bash
-    npm run build   # Production build
+    npm run build
     ```
