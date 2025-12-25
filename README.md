@@ -1,6 +1,10 @@
 # My App Store
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.1.1.
+> **Developer Note:** This application was designed to demonstrate my proficiency in building modern, scalable web interfaces using Angular and Angular Material. More than just a visual demo, this project reflects my approach to software development: creating clean, intuitive user experiences backed by robust, component-based architecture.
+
+It features a responsive layout, seamless navigation, and a refined UI inspired by industry standards. As a developer, I focus on writing maintainable code and leveraging the full potential of the Angular ecosystem to solve complex problems.
+
+Explore the app to see my work in action!
 
 ## Development server
 
