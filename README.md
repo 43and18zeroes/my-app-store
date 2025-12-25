@@ -9,7 +9,7 @@
 
 > **Developer Note:** This application was designed to demonstrate my proficiency in building modern, scalable web interfaces using Angular and Angular Material. More than just a visual demo, this project reflects my approach to software development: creating clean, intuitive user experiences backed by robust, component-based architecture.
 
-It features a responsive layout, seamless navigation, and a refined UI inspired by industry standards. As a developer, I focus on writing maintainable code and leveraging the full potential of the Angular ecosystem to solve complex problems.
+This project is intentionally frontend-focused and uses static/mock data to highlight UI architecture, performance, and component composition. It features a responsive layout, seamless navigation, and a refined UI inspired by industry standards. As a developer, I focus on writing maintainable code and leveraging the full potential of the Angular ecosystem to solve complex problems.
 
 Explore the app to see my work in action!
 
@@ -26,7 +26,7 @@ This project leverages the cutting-edge features of **Angular 20** to deliver a 
 ### UI & UX Components
 
 - **Angular Material & CDK:** Utilized for high-quality, accessible UI components (Data tables, navigation, and overlays).
-- **Interactive Galleries:** Integrated **PhotoSwipe** for professional-grade image interaction and **Swiper** for modern, touch-optimized carousels.
+- **Interactive Galleries:** Integrated **Swiper** for modern, touch-optimized carousels and lightbox.
 - **Custom Build Scripts:** Automated gallery manifest generation via custom Node.js scripts to streamline the asset pipeline.
 
 ### Engineering Practices
@@ -85,3 +85,8 @@ src/
    ```bash
    npm start
    ```
+4. Deploy:
+
+    ```bash
+    npm run build   # Production build
+    ```
