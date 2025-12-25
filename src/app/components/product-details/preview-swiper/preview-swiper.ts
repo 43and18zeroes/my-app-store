@@ -40,7 +40,7 @@ export class PreviewSwiper {
     this.gallery.loadImages(this.productPreviewsPath).subscribe((imgs) => {
       this.images = imgs;
       this.cdr.markForCheck();
-      queueMicrotask(() => this.initSwiper()); // statt setTimeout(0)
+      queueMicrotask(() => this.initSwiper());
     });
   }
 
