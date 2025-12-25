@@ -1,7 +1,12 @@
 ![Angular](https://img.shields.io/badge/angular-%23DD0031.svg?style=for-the-badge&logo=angular&logoColor=white) ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white) ![Material UI](https://img.shields.io/badge/Angular%20Material-%233F51B5.svg?style=for-the-badge&logo=angular&logoColor=white) ![Swiper.js](https://img.shields.io/badge/Swiper.js-%230080FF.svg?style=for-the-badge&logo=swiper&logoColor=white)
 
-![App Screenshot](./screenshots/screenshot-desktop.webp.webp)
-![App Screenshot](./screenshots/screenshot-mobile.webp.webp)
+![App Screenshot](./screenshots/screenshot-desktop.webp)
+![App Screenshot](./screenshots/screenshot-mobile.webp)
+
+<div style="display:flex;gap:16px">
+    <img src="./screenshots/screenshot-desktop.webp" alt="App Screenshot" height="380">
+    <img src="./screenshots/screenshot-mobile.webp" alt="App Screenshot" height="380">
+</div>
 
 # My App Store
 
