@@ -1,5 +1,8 @@
 ![Angular](https://img.shields.io/badge/angular-%23DD0031.svg?style=for-the-badge&logo=angular&logoColor=white) ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white) ![Material UI](https://img.shields.io/badge/Angular%20Material-%233F51B5.svg?style=for-the-badge&logo=angular&logoColor=white) ![Swiper.js](https://img.shields.io/badge/Swiper.js-%230080FF.svg?style=for-the-badge&logo=swiper&logoColor=white)
 
+![App Screenshot](./screenshots/screenshot-desktop.webp.webp)
+![App Screenshot](./screenshots/screenshot-mobile.webp.webp)
+
 # My App Store
 
 > **Developer Note:** This application was designed to demonstrate my proficiency in building modern, scalable web interfaces using Angular and Angular Material. More than just a visual demo, this project reflects my approach to software development: creating clean, intuitive user experiences backed by robust, component-based architecture.
