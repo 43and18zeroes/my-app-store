@@ -54,7 +54,7 @@ mat-sidenav-container {
     box-sizing: border-box;
     padding-bottom: calc(16px + env(safe-area-inset-bottom));
 
-    .sidenav-overlay {
+    .sidenav__overlay {
       position: absolute;
       top: 0;
       left: 0;
