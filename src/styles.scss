@@ -4,41 +4,33 @@
 
 html {
   color-scheme: light dark;
-  @include mat.theme(
-    (
-      color: mat.$azure-palette,
+  @include mat.theme((color: mat.$azure-palette,
       typography: Roboto,
       density: 0,
-    )
-  );
+    ));
 }
 
 .darkMode {
   color-scheme: dark;
-  @include mat.theme(
-    (
-      color: mat.$azure-palette,
+  @include mat.theme((color: mat.$azure-palette,
       typography: Roboto,
       density: 0,
-    )
-  );
+    ));
 }
 
 .lightMode {
   color-scheme: light;
-  @include mat.theme(
-    (
-      color: mat.$azure-palette,
+  @include mat.theme((color: mat.$azure-palette,
       typography: Roboto,
       density: 0,
-    )
-  );
+    ));
 }
 
 html,
 body {
   height: 100%;
 }
+
 body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
@@ -80,39 +72,29 @@ h2 {
   will-change: box-shadow, transform;
   cursor: pointer;
   box-shadow: 0 3px 5px -1px color-mix(in srgb, light-dark(#000, #fff) 10%, light-dark(#faf9fd, #121316)),
-    0 6px 10px 0
-      color-mix(
-        in srgb,
-        light-dark(#000, #fff) 10%,
-        light-dark(#faf9fd, #121316)
-      ),
-    0 1px 18px 0
-      color-mix(
-        in srgb,
-        light-dark(#000, #fff) 6%,
-        light-dark(#faf9fd, #121316)
-      );
+    0 6px 10px 0 color-mix(in srgb,
+      light-dark(#000, #fff) 10%,
+      light-dark(#faf9fd, #121316)),
+    0 1px 18px 0 color-mix(in srgb,
+      light-dark(#000, #fff) 6%,
+      light-dark(#faf9fd, #121316));
+
   &:hover,
   &:focus {
     box-shadow: 0 6px 7px -0.7px color-mix(in srgb, light-dark(#000, #fff) 10%, light-dark(#faf9fd, #121316)),
-      0 10px 11.2px 0.7px
-        color-mix(
-          in srgb,
-          light-dark(#000, #fff) 10%,
-          light-dark(#faf9fd, #121316)
-        ),
-      0 2px 18.2px 1.4px
-        color-mix(
-          in srgb,
-          light-dark(#000, #fff) 6%,
-          light-dark(#faf9fd, #121316)
-        );
+      0 10px 11.2px 0.7px color-mix(in srgb,
+        light-dark(#000, #fff) 10%,
+        light-dark(#faf9fd, #121316)),
+      0 2px 18.2px 1.4px color-mix(in srgb,
+        light-dark(#000, #fff) 6%,
+        light-dark(#faf9fd, #121316));
     transform: translateY(-1px);
   }
 }
 
 .full-screen-lightbox {
   background: transparent !important;
+
   .mat-mdc-dialog-surface {
     background: rgba(0, 0, 0, 0);
     box-shadow: none !important;
@@ -131,4 +113,12 @@ a {
   &:visited {
     color: light-dark(#551a8b, #c58af9);
   }
+}
+
+.no__transition * {
+  -webkit-transition: none !important;
+  -moz-transition: none !important;
+  -ms-transition: none !important;
+  -o-transition: none !important;
+  transition: none !important;
 }

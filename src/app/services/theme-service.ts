@@ -7,8 +7,12 @@ export class ThemeService {
   darkMode = signal(false);
 
   initTheme() {
+    document.documentElement.classList.add('no__transition');
     this.loadDarkModeFromStorageOrSystem();
     this.listenToSystemPreferenceChanges();
+    setTimeout(() => {
+      document.documentElement.classList.remove('no__transition');
+    }, 100);
   }
 
   private loadDarkModeFromStorageOrSystem(): void {
