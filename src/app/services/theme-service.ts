@@ -7,9 +7,13 @@ export class ThemeService {
   darkMode = signal(false);
 
   initTheme() {
+    // Temporarily disable transitions to prevent a visual "flash" or 
+    // color sliding effect when the app loads and applies the initial theme.
     document.documentElement.classList.add('no__transition');
     this.loadDarkModeFromStorageOrSystem();
     this.listenToSystemPreferenceChanges();
+    // Re-enable transitions after the initial theme has been applied 
+    // to allow smooth animations for future manual toggles.
     setTimeout(() => {
       document.documentElement.classList.remove('no__transition');
     }, 100);
